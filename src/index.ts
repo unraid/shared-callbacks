@@ -1,40 +1,75 @@
-import AES from 'crypto-js/aes';
-import Utf8 from 'crypto-js/enc-utf8';
-import { createSharedComposable } from '@vueuse/core';
+import AES from "crypto-js/aes";
+import Utf8 from "crypto-js/enc-utf8";
+import { createSharedComposable } from "@vueuse/core";
 import type {
   CallbackConfig,
   QueryPayloads,
   SendPayloads,
   WatcherOptions,
-} from './types.js';
+  SignIn,
+  SignOut,
+  OemSignOut,
+  Troubleshoot,
+  Recover,
+  Replace,
+  TrialExtend,
+  TrialStart,
+  Purchase,
+  Redeem,
+  Renew,
+  Upgrade,
+  UpdateOs,
+  DowngradeOs,
+  Manage,
+  MyKeys,
+  LinkKey,
+  Activate,
+  AccountActionTypes,
+  AccountKeyActionTypes,
+  PurchaseActionTypes,
+  ServerActionTypes,
+  ServerState,
+  ServerData,
+  UserInfo,
+  ExternalSignIn,
+  ExternalSignOut,
+  ExternalKeyActions,
+  ExternalUpdateOsAction,
+  ServerPayload,
+  ServerTroubleshoot,
+  ExternalActions,
+  UpcActions,
+  ExternalPayload,
+  UpcPayload,
+} from "./types.js";
 
 const _useCallback = (config: CallbackConfig) => {
   const send = (
     url: string,
     payload: SendPayloads,
-    redirectType?: 'newTab' | 'replace' | null,
+    redirectType?: "newTab" | "replace" | null,
     sendType?: string,
     sender?: string
   ) => {
     const stringifiedData = JSON.stringify({
       actions: [...payload],
-      sender: sender ?? window.location.href.replace('/Tools/Update', '/Tools'),
+      sender: sender ?? window.location.href.replace("/Tools/Update", "/Tools"),
       type: sendType,
     });
-    
+
     const encryptedMessage = AES.encrypt(
       stringifiedData,
       config.encryptionKey
     ).toString();
-    
-    const destinationUrl = new URL(url.replace('/Tools/Update', '/Tools'));
-    destinationUrl.searchParams.set('data', encodeURI(encryptedMessage));
-    
-    if (redirectType === 'newTab') {
-      window.open(destinationUrl.toString(), '_blank');
+
+    const destinationUrl = new URL(url.replace("/Tools/Update", "/Tools"));
+    destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
+
+    if (redirectType === "newTab") {
+      window.open(destinationUrl.toString(), "_blank");
       return;
     }
-    if (redirectType === 'replace') {
+    if (redirectType === "replace") {
       window.location.replace(destinationUrl.toString());
       return;
     }
@@ -53,7 +88,7 @@ const _useCallback = (config: CallbackConfig) => {
   };
 
   const watcher = (options: WatcherOptions = {}): QueryPayloads | undefined => {
-    let urlToParse: string = '';
+    let urlToParse: string = "";
     if (options?.baseUrl && !options.skipCurrentUrl) {
       urlToParse = options.baseUrl;
     } else if (window && window.location && !options.skipCurrentUrl) {
@@ -62,7 +97,7 @@ const _useCallback = (config: CallbackConfig) => {
 
     const currentUrl = new URL(urlToParse);
     const uriDecodedEncryptedData = decodeURI(
-      options?.dataToParse ?? currentUrl?.searchParams.get('data') ?? ''
+      options?.dataToParse ?? currentUrl?.searchParams.get("data") ?? ""
     );
 
     if (!uriDecodedEncryptedData) {
@@ -79,4 +114,47 @@ const _useCallback = (config: CallbackConfig) => {
   };
 };
 
-export const useCallback = createSharedComposable(_useCallback); 
+export const useCallback = createSharedComposable(_useCallback);
+
+// Re-export all types
+export type {
+  CallbackConfig,
+  QueryPayloads,
+  SendPayloads,
+  WatcherOptions,
+  SignIn,
+  SignOut,
+  OemSignOut,
+  Troubleshoot,
+  Recover,
+  Replace,
+  TrialExtend,
+  TrialStart,
+  Purchase,
+  Redeem,
+  Renew,
+  Upgrade,
+  UpdateOs,
+  DowngradeOs,
+  Manage,
+  MyKeys,
+  LinkKey,
+  Activate,
+  AccountActionTypes,
+  AccountKeyActionTypes,
+  PurchaseActionTypes,
+  ServerActionTypes,
+  ServerState,
+  ServerData,
+  UserInfo,
+  ExternalSignIn,
+  ExternalSignOut,
+  ExternalKeyActions,
+  ExternalUpdateOsAction,
+  ServerPayload,
+  ServerTroubleshoot,
+  ExternalActions,
+  UpcActions,
+  ExternalPayload,
+  UpcPayload,
+};
