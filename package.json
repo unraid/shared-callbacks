@@ -16,10 +16,13 @@
     "prebuild": "pnpm clean"
   },
   "dependencies": {
-    "@vueuse/core": "^10.9.0",
     "crypto-js": "^4.2.0"
   },
+  "peerDependencies": {
+    "@vueuse/core": "^10.9.0"
+  },
   "devDependencies": {
+    "@vueuse/core": "^10.9.0",
     "@types/crypto-js": "^4.2.1",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
