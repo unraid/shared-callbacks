@@ -1,0 +1,33 @@
+{
+  "name": "@unraid/shared-callbacks",
+  "version": "0.0.1",
+  "private": false,
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rimraf dist",
+    "prebuild": "pnpm clean"
+  },
+  "dependencies": {
+    "@vueuse/core": "^10.9.0",
+    "crypto-js": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.1",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  },
+  "packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "vue-demi"
+    ]
+  }
+}
