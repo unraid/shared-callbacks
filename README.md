@@ -1,4 +1,4 @@
-# @unraid/callback
+# @unraid/shared-callbacks
 
 A TypeScript package for handling callbacks in Unraid applications. This package provides a flexible and type-safe way to handle encrypted callbacks between different parts of the Unraid ecosystem.
 
@@ -6,20 +6,19 @@ A TypeScript package for handling callbacks in Unraid applications. This package
 
 - Type-safe callback handling
 - AES encryption/decryption of payloads
-- Pinia store integration
 - Support for various callback types (sign in, sign out, key actions, etc.)
 - Flexible URL handling with support for different redirect types
 
 ## Installation
 
 ```bash
-pnpm add @unraid/callback
+pnpm add @unraid/shared-callbacks
 ```
 
 ## Usage
 
 ```typescript
-import { createCallbackStore, CallbackActionsStore } from '@unraid/callback';
+import { createCallbackStore, CallbackActionsStore } from '@unraid/shared-callbacks';
 
 // Define your callback actions store
 const useCallbackActions = (): CallbackActionsStore => ({
@@ -78,7 +77,3 @@ interface CallbackActionsStore {
   sendType: 'fromUpc' | 'forUpc';
 }
 ```
-
-## License
-
-MIT 
