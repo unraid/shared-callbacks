@@ -1,21 +1,21 @@
-import AES from 'crypto-js/aes';
-import Utf8 from 'crypto-js/enc-utf8';
-import { createSharedComposable } from '@vueuse/core';
+import AES from "crypto-js/aes";
+import Utf8 from "crypto-js/enc-utf8";
+import { createSharedComposable } from "@vueuse/core";
 const _useCallback = (config) => {
     const send = (url, payload, redirectType, sendType, sender) => {
         const stringifiedData = JSON.stringify({
             actions: [...payload],
-            sender: sender ?? window.location.href.replace('/Tools/Update', '/Tools'),
+            sender: sender ?? window.location.href.replace("/Tools/Update", "/Tools"),
             type: sendType,
         });
         const encryptedMessage = AES.encrypt(stringifiedData, config.encryptionKey).toString();
-        const destinationUrl = new URL(url.replace('/Tools/Update', '/Tools'));
-        destinationUrl.searchParams.set('data', encodeURI(encryptedMessage));
-        if (redirectType === 'newTab') {
-            window.open(destinationUrl.toString(), '_blank');
+        const destinationUrl = new URL(url.replace("/Tools/Update", "/Tools"));
+        destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
+        if (redirectType === "newTab") {
+            window.open(destinationUrl.toString(), "_blank");
             return;
         }
-        if (redirectType === 'replace') {
+        if (redirectType === "replace") {
             window.location.replace(destinationUrl.toString());
             return;
         }
@@ -30,7 +30,7 @@ const _useCallback = (config) => {
         return decryptedData;
     };
     const watcher = (options = {}) => {
-        let urlToParse = '';
+        let urlToParse = "";
         if (options?.baseUrl && !options.skipCurrentUrl) {
             urlToParse = options.baseUrl;
         }
@@ -38,7 +38,7 @@ const _useCallback = (config) => {
             urlToParse = window.location.toString();
         }
         const currentUrl = new URL(urlToParse);
-        const uriDecodedEncryptedData = decodeURI(options?.dataToParse ?? currentUrl?.searchParams.get('data') ?? '');
+        const uriDecodedEncryptedData = decodeURI(options?.dataToParse ?? currentUrl?.searchParams.get("data") ?? "");
         if (!uriDecodedEncryptedData) {
             return undefined;
         }
