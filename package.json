@@ -24,7 +24,7 @@
     "@vueuse/core": "^10.9.0"
   },
   "devDependencies": {
-    "@vueuse/core": "^10.9.0",
+    "@vueuse/core": "^13.0.0",
     "@types/crypto-js": "^4.2.1",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
