@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/unraid/shared-callbacks/compare/v1.0.0...v1.0.1) (2025-03-27)
+
+
+### Bug Fixes
+
+* allow publishing ([dbf4307](https://github.com/unraid/shared-callbacks/commit/dbf4307e34977dbf88a2417ad837cc3090f5b66b))
+
 ## 1.0.0 (2025-03-27)
 
 
