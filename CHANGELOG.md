@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/unraid/shared-callbacks/compare/v1.0.2...v1.0.3) (2025-04-08)
+
+
+### Bug Fixes
+
+* disable git checks ([6e339a3](https://github.com/unraid/shared-callbacks/commit/6e339a3643f6e8141ba82049823cf046f1ed720a))
+
 ## [1.0.2](https://github.com/unraid/shared-callbacks/compare/v1.0.1...v1.0.2) (2025-04-08)
 
 
