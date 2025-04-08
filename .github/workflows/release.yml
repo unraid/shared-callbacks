@@ -61,7 +61,7 @@ jobs:
         run: pnpm run build
 
       - name: test
-        run: pnpm run test
+        run: pnpm run test:coverage
 
       - name: Setup NPM Authentication
         if: ${{ needs.release-please.outputs.release_created }}
