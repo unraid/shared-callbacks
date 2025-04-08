@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/unraid/shared-callbacks/compare/v1.0.1...v1.0.2) (2025-04-08)
+
+
+### Bug Fixes
+
+* invalid ESM import ([#12](https://github.com/unraid/shared-callbacks/issues/12)) ([67c5658](https://github.com/unraid/shared-callbacks/commit/67c56580b4ba1e8951d4a3d00dbff8dd90e6f88a))
+
 ## [1.0.1](https://github.com/unraid/shared-callbacks/compare/v1.0.0...v1.0.1) (2025-03-27)
 
 
