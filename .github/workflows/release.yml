@@ -12,20 +12,18 @@ concurrency:
 jobs:
   release-please:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - uses: googleapis/release-please-action@v4
+        if: github.ref == 'refs/heads/main'
         id: release
         with:
           release-type: node
   build:
     runs-on: ubuntu-latest
     needs: [release-please]
-    # Run on all PRs, or when a release is created
-    if: ${{ github.event_name == 'pull_request' || needs.release-please.outputs.release_created }}
 
     steps:
       - uses: actions/checkout@v4
@@ -62,8 +60,8 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      # - name: test
-      #   run: pnpm run test
+      - name: test
+        run: pnpm run test:coverage
 
       - name: Setup NPM Authentication
         if: ${{ needs.release-please.outputs.release_created }}

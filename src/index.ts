@@ -1,5 +1,5 @@
-import AES from "crypto-js/aes";
-import Utf8 from "crypto-js/enc-utf8";
+import AES from "crypto-js/aes.js";
+import Utf8 from "crypto-js/enc-utf8.js";
 import { createSharedComposable } from "@vueuse/core";
 import type {
   CallbackConfig,
@@ -81,10 +81,27 @@ const _useCallback = (config: CallbackConfig) => {
       ? decodeURI(data)
       : data;
     const decryptedMessage = AES.decrypt(dataToParse, config.encryptionKey);
-    const decryptedData: QueryPayloads = JSON.parse(
-      decryptedMessage.toString(Utf8)
-    );
-    return decryptedData;
+
+    let decryptedString: string;
+    try {
+      decryptedString = decryptedMessage.toString(Utf8);
+    } catch (e) {
+      // Catch errors during UTF-8 conversion (likely due to bad decryption)
+      throw new Error('Decryption failed. Invalid key or corrupt data.');
+    }
+
+    // Check if decryption resulted in an empty string (another failure case)
+    if (!decryptedString) {
+      throw new Error('Decryption failed. Invalid key or corrupt data.');
+    }
+
+    try {
+      const decryptedData: QueryPayloads = JSON.parse(decryptedString);
+      return decryptedData;
+    } catch (e) {
+      // Catch potential JSON parse errors even if decryption seemed successful
+      throw new Error('Failed to parse decrypted data.');
+    }
   };
 
   const watcher = (options: WatcherOptions = {}): QueryPayloads | undefined => {

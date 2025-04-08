@@ -1,5 +1,5 @@
-import AES from "crypto-js/aes";
-import Utf8 from "crypto-js/enc-utf8";
+import AES from "crypto-js/aes.js";
+import Utf8 from "crypto-js/enc-utf8.js";
 import { createSharedComposable } from "@vueuse/core";
 const _useCallback = (config) => {
     const send = (url, payload, redirectType, sendType, sender) => {
