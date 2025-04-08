@@ -17,13 +17,13 @@ importers:
         version: 4.2.2
       '@vueuse/core':
         specifier: ^13.0.0
-        version: 13.0.0(vue@3.5.13(typescript@5.8.2))
+        version: 13.1.0(vue@3.5.13(typescript@5.8.3))
       rimraf:
         specifier: ^5.0.5
         version: 5.0.10
       typescript:
         specifier: ^5.3.3
-        version: 5.8.2
+        version: 5.8.3
 
 packages:
 
@@ -90,16 +90,16 @@ packages:
   '@vue/shared@3.5.13':
     resolution: {integrity: sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==}
 
-  '@vueuse/core@13.0.0':
-    resolution: {integrity: sha512-rkgb4a8/0b234lMGCT29WkCjPfsX0oxrIRR7FDndRoW3FsaC9NBzefXg/9TLhAgwM11f49XnutshM4LzJBrQ5g==}
+  '@vueuse/core@13.1.0':
+    resolution: {integrity: sha512-PAauvdRXZvTWXtGLg8cPUFjiZEddTqmogdwYpnn60t08AA5a8Q4hZokBnpTOnVNqySlFlTcRYIC8OqreV4hv3Q==}
     peerDependencies:
       vue: ^3.5.0
 
-  '@vueuse/metadata@13.0.0':
-    resolution: {integrity: sha512-TRNksqmvtvqsuHf7bbgH9OSXEV2b6+M3BSN4LR5oxWKykOFT9gV78+C2/0++Pq9KCp9KQ1OQDPvGlWNQpOb2Mw==}
+  '@vueuse/metadata@13.1.0':
+    resolution: {integrity: sha512-+TDd7/a78jale5YbHX9KHW3cEDav1lz1JptwDvep2zSG8XjCsVE+9mHIzjTOaPbHUAk5XiE4jXLz51/tS+aKQw==}
 
-  '@vueuse/shared@13.0.0':
-    resolution: {integrity: sha512-9MiHhAPw+sqCF/RLo8V6HsjRqEdNEWVpDLm2WBRW2G/kSQjb8X901sozXpSCaeLG0f7TEfMrT4XNaA5m1ez7Dg==}
+  '@vueuse/shared@13.1.0':
+    resolution: {integrity: sha512-IVS/qRRjhPTZ6C2/AM3jieqXACGwFZwWTdw5sNTSKk2m/ZpkuuN+ri+WCVUP8TqaKwJYt/KuMwmXspMAw8E6ew==}
     peerDependencies:
       vue: ^3.5.0
 
@@ -249,8 +249,8 @@ packages:
     resolution: {integrity: sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==}
     engines: {node: '>=12'}
 
-  typescript@5.8.2:
-    resolution: {integrity: sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==}
+  typescript@5.8.3:
+    resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -354,26 +354,26 @@ snapshots:
       '@vue/shared': 3.5.13
       csstype: 3.1.3
 
-  '@vue/server-renderer@3.5.13(vue@3.5.13(typescript@5.8.2))':
+  '@vue/server-renderer@3.5.13(vue@3.5.13(typescript@5.8.3))':
     dependencies:
       '@vue/compiler-ssr': 3.5.13
       '@vue/shared': 3.5.13
-      vue: 3.5.13(typescript@5.8.2)
+      vue: 3.5.13(typescript@5.8.3)
 
   '@vue/shared@3.5.13': {}
 
-  '@vueuse/core@13.0.0(vue@3.5.13(typescript@5.8.2))':
+  '@vueuse/core@13.1.0(vue@3.5.13(typescript@5.8.3))':
     dependencies:
       '@types/web-bluetooth': 0.0.21
-      '@vueuse/metadata': 13.0.0
-      '@vueuse/shared': 13.0.0(vue@3.5.13(typescript@5.8.2))
-      vue: 3.5.13(typescript@5.8.2)
+      '@vueuse/metadata': 13.1.0
+      '@vueuse/shared': 13.1.0(vue@3.5.13(typescript@5.8.3))
+      vue: 3.5.13(typescript@5.8.3)
 
-  '@vueuse/metadata@13.0.0': {}
+  '@vueuse/metadata@13.1.0': {}
 
-  '@vueuse/shared@13.0.0(vue@3.5.13(typescript@5.8.2))':
+  '@vueuse/shared@13.1.0(vue@3.5.13(typescript@5.8.3))':
     dependencies:
-      vue: 3.5.13(typescript@5.8.2)
+      vue: 3.5.13(typescript@5.8.3)
 
   ansi-regex@5.0.1: {}
 
@@ -506,17 +506,17 @@ snapshots:
     dependencies:
       ansi-regex: 6.1.0
 
-  typescript@5.8.2: {}
+  typescript@5.8.3: {}
 
-  vue@3.5.13(typescript@5.8.2):
+  vue@3.5.13(typescript@5.8.3):
     dependencies:
       '@vue/compiler-dom': 3.5.13
       '@vue/compiler-sfc': 3.5.13
       '@vue/runtime-dom': 3.5.13
-      '@vue/server-renderer': 3.5.13(vue@3.5.13(typescript@5.8.2))
+      '@vue/server-renderer': 3.5.13(vue@3.5.13(typescript@5.8.3))
       '@vue/shared': 3.5.13
     optionalDependencies:
-      typescript: 5.8.2
+      typescript: 5.8.3
 
   which@2.0.2:
     dependencies:
