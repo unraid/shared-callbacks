@@ -52,6 +52,20 @@ export type ServerState = 'BASIC'
   | undefined;
 
 export interface ServerData {
+  activationCodeData?: {
+    __typename?: 'ActivationCode';
+    background?: string;
+    code?: string;
+    comment?: string;
+    header?: string;
+    headermetacolor?: string;
+    partnerName?: string;
+    partnerUrl?: string;
+    serverName?: string;
+    showBannerGradient?: boolean;
+    sysModel?: string;
+    theme?: string;
+  },
   description?: string;
   deviceCount?: number;
   expireTime?: number;
