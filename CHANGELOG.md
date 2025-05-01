@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/unraid/shared-callbacks/compare/v1.1.0...v1.1.1) (2025-05-01)
+
+
+### Bug Fixes
+
+* move activation code data to its own interface ([19ef19a](https://github.com/unraid/shared-callbacks/commit/19ef19ac156cfd28419e7784a60660e4fff48098))
+
 ## [1.1.0](https://github.com/unraid/shared-callbacks/compare/v1.0.3...v1.1.0) (2025-05-01)
 
 
