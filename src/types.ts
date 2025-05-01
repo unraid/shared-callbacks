@@ -73,21 +73,23 @@ export type ServerState =
   | "STALE"
   | undefined;
 
+export interface ActivationCodeData {
+  __typename?: "ActivationCode";
+  background?: string | null;
+  code?: string | null;
+  comment?: string | null;
+  header?: string | null;
+  headermetacolor?: string | null;
+  partnerName?: string | null;
+  partnerUrl?: string | null;
+  serverName?: string | null;
+  showBannerGradient?: boolean | null;
+  sysModel?: string | null;
+  theme?: string | null;
+}
+
 export interface ServerData {
-  activationCodeData?: {
-    __typename?: "ActivationCode";
-    background?: string | null;
-    code?: string | null;
-    comment?: string | null;
-    header?: string | null;
-    headermetacolor?: string | null;
-    partnerName?: string | null;
-    partnerUrl?: string | null;
-    serverName?: string | null;
-    showBannerGradient?: boolean | null;
-    sysModel?: string | null;
-    theme?: string | null;
-  } | null;
+  activationCodeData?: ActivationCodeData | null;
   description?: string;
   deviceCount?: number;
   expireTime?: number;
