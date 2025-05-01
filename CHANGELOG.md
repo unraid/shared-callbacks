@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/unraid/shared-callbacks/compare/v1.0.3...v1.1.0) (2025-05-01)
+
+
+### Features
+
+* add activationCodeData type to ServerData interface ([#17](https://github.com/unraid/shared-callbacks/issues/17)) ([0cd66de](https://github.com/unraid/shared-callbacks/commit/0cd66de416773cf2f936217baf8c72f1f2e434ba))
+
 ## [1.0.3](https://github.com/unraid/shared-callbacks/compare/v1.0.2...v1.0.3) (2025-04-08)
 
 
