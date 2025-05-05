@@ -82,7 +82,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: |
-            🔑 Keyserver Release ${{ needs.release-please.outputs.tag_name }} created!
+            📚 Shared Callback Library ${{ needs.release-please.outputs.tag_name }} created!
 
             **Changelog:**
             ${{ needs.release-please.outputs.body }}
