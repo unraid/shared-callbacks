@@ -196,5 +196,196 @@ describe('useCallback', () => {
       const result = callback.watcher({ dataToParse: encryptedData })
       expect(result).toEqual(testData)
     })
+
+    it('should work without window (server-side) when dataToParse is provided', () => {
+      const originalWindow = global.window
+      // @ts-ignore - removing window to simulate server-side
+      delete global.window
+
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testData = {
+        actions: testActions,
+        sender: 'http://test.com/Tools',
+        type: 'test'
+      }
+      const stringifiedData = JSON.stringify(testData)
+      const encryptedData = AES.encrypt(stringifiedData, mockConfig.encryptionKey).toString()
+
+      const result = callback.watcher({ dataToParse: encryptedData })
+      expect(result).toEqual(testData)
+
+      // Restore window
+      global.window = originalWindow
+    })
+
+    it('should return undefined on server-side when no data source is provided', () => {
+      const originalWindow = global.window
+      // @ts-ignore - removing window to simulate server-side
+      delete global.window
+
+      const callback = useCallback(mockConfig)
+      const result = callback.watcher()
+      expect(result).toBeUndefined()
+
+      // Restore window
+      global.window = originalWindow
+    })
+  })
+
+  describe('generateUrl function', () => {
+    it('should generate a URL with encrypted data', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const targetUrl = 'http://test.com/c'
+      const sendType = 'forUpc'
+      const sender = 'http://test.com/Tools'
+
+      const generatedUrl = callback.generateUrl(targetUrl, testActions, sendType, sender)
+      const url = new URL(generatedUrl)
+
+      expect(url.origin + url.pathname).toBe(targetUrl)
+      expect(url.searchParams.has('data')).toBe(true)
+
+      // Verify the encrypted data can be decrypted
+      const encryptedData = url.searchParams.get('data') || ''
+      const decryptedData = callback.parse(encryptedData)
+      expect(decryptedData).toEqual({
+        actions: testActions,
+        sender,
+        type: sendType
+      })
+    })
+
+    it('should use window.location.href as default sender on client-side', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const targetUrl = 'http://test.com/c'
+      const sendType = 'forUpc'
+
+      const generatedUrl = callback.generateUrl(targetUrl, testActions, sendType)
+      const url = new URL(generatedUrl)
+
+      const encryptedData = url.searchParams.get('data') || ''
+      const decryptedData = callback.parse(encryptedData)
+      
+      // Should use window.location.href (mocked to 'http://test.com/Tools/Update')
+      // which gets normalized to 'http://test.com/Tools'
+      expect(decryptedData.sender).toBe('http://test.com/Tools')
+    })
+
+    it('should use empty string as default sender on server-side', () => {
+      const originalWindow = global.window
+      // @ts-ignore - removing window to simulate server-side
+      delete global.window
+
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const targetUrl = 'http://test.com/c'
+      const sendType = 'forUpc'
+
+      const generatedUrl = callback.generateUrl(targetUrl, testActions, sendType)
+      const url = new URL(generatedUrl)
+
+      const encryptedData = url.searchParams.get('data') || ''
+      const decryptedData = callback.parse(encryptedData)
+      
+      // Should use empty string when window is not available
+      expect(decryptedData.sender).toBe('')
+
+      // Restore window
+      global.window = originalWindow
+    })
+
+    it('should work with different URL formats', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      
+      const urls = [
+        'http://test.com/c',
+        'https://example.com/Tools',
+        'https://server.local:8080/c'
+      ]
+
+      urls.forEach(targetUrl => {
+        const generatedUrl = callback.generateUrl(targetUrl, testActions, 'forUpc', 'http://sender.com')
+        const url = new URL(generatedUrl)
+        
+        expect(url.origin + url.pathname).toBe(targetUrl)
+        expect(url.searchParams.has('data')).toBe(true)
+      })
+    })
+
+    it('should preserve URL query parameters', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const targetUrl = 'http://test.com/c?existing=param'
+
+      const generatedUrl = callback.generateUrl(targetUrl, testActions, 'forUpc', 'http://sender.com')
+      const url = new URL(generatedUrl)
+
+      expect(url.searchParams.get('existing')).toBe('param')
+      expect(url.searchParams.has('data')).toBe(true)
+    })
+  })
+
+  describe('SSR compatibility', () => {
+    it('should throw error when send() is called on server-side', () => {
+      const originalWindow = global.window
+      // @ts-ignore - removing window to simulate server-side
+      delete global.window
+
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+
+      expect(() => {
+        callback.send('http://test.com/Tools', testActions, null, 'test', 'http://sender.com')
+      }).toThrow('send() can only be called on the client side')
+
+      // Restore window
+      global.window = originalWindow
+    })
+
+    it('should allow parse() to work on server-side', () => {
+      const originalWindow = global.window
+      // @ts-ignore - removing window to simulate server-side
+      delete global.window
+
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testData = {
+        actions: testActions,
+        sender: 'http://test.com/Tools',
+        type: 'test'
+      }
+      const stringifiedData = JSON.stringify(testData)
+      const encryptedData = AES.encrypt(stringifiedData, mockConfig.encryptionKey).toString()
+
+      const decryptedData = callback.parse(encryptedData)
+      expect(decryptedData).toEqual(testData)
+
+      // Restore window
+      global.window = originalWindow
+    })
+
+    it('should allow generateUrl() to work on server-side', () => {
+      const originalWindow = global.window
+      // @ts-ignore - removing window to simulate server-side
+      delete global.window
+
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const targetUrl = 'http://test.com/c'
+      const sender = 'http://sender.com'
+
+      const generatedUrl = callback.generateUrl(targetUrl, testActions, 'forUpc', sender)
+      const url = new URL(generatedUrl)
+
+      expect(url.origin + url.pathname).toBe(targetUrl)
+      expect(url.searchParams.has('data')).toBe(true)
+
+      // Restore window
+      global.window = originalWindow
+    })
   })
 }) 

@@ -51,6 +51,11 @@ const _useCallback = (config: CallbackConfig) => {
     sendType?: string,
     sender?: string
   ) => {
+    // send() requires browser APIs and is client-only
+    if (typeof window === "undefined") {
+      throw new Error("send() can only be called on the client side");
+    }
+
     const stringifiedData = JSON.stringify({
       actions: [...payload],
       sender: sender ?? window.location.href.replace("/Tools/Update", "/Tools"),
@@ -108,14 +113,24 @@ const _useCallback = (config: CallbackConfig) => {
     let urlToParse: string = "";
     if (options?.baseUrl && !options.skipCurrentUrl) {
       urlToParse = options.baseUrl;
-    } else if (window && window.location && !options.skipCurrentUrl) {
+    } else if (typeof window !== "undefined" && window.location && !options.skipCurrentUrl) {
       urlToParse = window.location.toString();
+    } else if (!options?.dataToParse && !options?.baseUrl) {
+      // If no window and no explicit data/baseUrl provided, return undefined
+      return undefined;
     }
 
-    const currentUrl = new URL(urlToParse);
-    const uriDecodedEncryptedData = decodeURI(
-      options?.dataToParse ?? currentUrl?.searchParams.get("data") ?? ""
-    );
+    // If we have dataToParse, use it directly; otherwise parse from URL
+    const uriDecodedEncryptedData = options?.dataToParse 
+      ? decodeURI(options.dataToParse)
+      : (() => {
+          try {
+            const currentUrl = new URL(urlToParse);
+            return decodeURI(currentUrl.searchParams.get("data") ?? "");
+          } catch {
+            return "";
+          }
+        })();
 
     if (!uriDecodedEncryptedData) {
       return undefined;
@@ -124,10 +139,42 @@ const _useCallback = (config: CallbackConfig) => {
     return parse(uriDecodedEncryptedData);
   };
 
+  const generateUrl = (
+    url: string,
+    payload: SendPayloads,
+    sendType?: string,
+    sender?: string
+  ): string => {
+    // generateUrl() works on both server and client
+    // If no sender provided and we're on client, use window.location; otherwise use empty string
+    const defaultSender = sender ?? (
+      typeof window !== "undefined" 
+        ? window.location.href.replace("/Tools/Update", "/Tools")
+        : ""
+    );
+
+    const stringifiedData = JSON.stringify({
+      actions: [...payload],
+      sender: defaultSender,
+      type: sendType,
+    });
+
+    const encryptedMessage = AES.encrypt(
+      stringifiedData,
+      config.encryptionKey
+    ).toString();
+
+    const destinationUrl = new URL(url);
+    destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
+
+    return destinationUrl.toString();
+  };
+
   return {
     send,
     parse,
     watcher,
+    generateUrl,
   };
 };
 
