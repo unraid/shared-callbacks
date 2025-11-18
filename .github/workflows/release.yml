@@ -64,6 +64,13 @@ jobs:
       - name: test
         run: pnpm run test:coverage
 
+      - name: Upload all coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/coverage-final.json
+          fail_ci_if_error: false
+
       - name: Setup NPM Authentication
         if: ${{ needs.release-please.outputs.release_created }}
         run: |

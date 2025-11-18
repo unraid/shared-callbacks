@@ -43,6 +43,63 @@ import type {
   UpcPayload,
 } from "./types.js";
 
+/**
+ * Encrypts a string using AES encryption
+ */
+const encryptData = (data: string, encryptionKey: string): string => {
+  return AES.encrypt(data, encryptionKey).toString();
+};
+
+/**
+ * Decrypts an encrypted string using AES decryption
+ */
+const decryptData = (encryptedData: string, encryptionKey: string): string => {
+  const decryptedMessage = AES.decrypt(encryptedData, encryptionKey);
+
+  let decryptedString: string;
+  try {
+    decryptedString = decryptedMessage.toString(Utf8);
+  } catch (e) {
+    // Catch errors during UTF-8 conversion (likely due to bad decryption)
+    throw new Error('Decryption failed. Invalid key or corrupt data.');
+  }
+
+  // Check if decryption resulted in an empty string (another failure case)
+  if (!decryptedString) {
+    throw new Error('Decryption failed. Invalid key or corrupt data.');
+  }
+
+  return decryptedString;
+};
+
+/**
+ * Stringifies a payload into the standard callback data format
+ */
+const stringifyPayload = (
+  payload: SendPayloads,
+  sender: string,
+  sendType?: string
+): string => {
+  return JSON.stringify({
+    actions: [...payload],
+    sender,
+    type: sendType,
+  });
+};
+
+/**
+ * Creates an encrypted data string from a payload
+ */
+const createEncryptedPayload = (
+  payload: SendPayloads,
+  sender: string,
+  sendType: string | undefined,
+  encryptionKey: string
+): string => {
+  const stringifiedData = stringifyPayload(payload, sender, sendType);
+  return encryptData(stringifiedData, encryptionKey);
+};
+
 const _useCallback = (config: CallbackConfig) => {
   const send = (
     url: string,
@@ -51,16 +108,18 @@ const _useCallback = (config: CallbackConfig) => {
     sendType?: string,
     sender?: string
   ) => {
-    const stringifiedData = JSON.stringify({
-      actions: [...payload],
-      sender: sender ?? window.location.href.replace("/Tools/Update", "/Tools"),
-      type: sendType,
-    });
+    // send() requires browser APIs and is client-only
+    if (typeof window === "undefined") {
+      throw new Error("send() can only be called on the client side");
+    }
 
-    const encryptedMessage = AES.encrypt(
-      stringifiedData,
+    const defaultSender = sender ?? window.location.href.replace("/Tools/Update", "/Tools");
+    const encryptedMessage = createEncryptedPayload(
+      payload,
+      defaultSender,
+      sendType,
       config.encryptionKey
-    ).toString();
+    );
 
     const destinationUrl = new URL(url.replace("/Tools/Update", "/Tools"));
     destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
@@ -80,20 +139,8 @@ const _useCallback = (config: CallbackConfig) => {
     const dataToParse: string = options?.isDataURIEncoded
       ? decodeURI(data)
       : data;
-    const decryptedMessage = AES.decrypt(dataToParse, config.encryptionKey);
-
-    let decryptedString: string;
-    try {
-      decryptedString = decryptedMessage.toString(Utf8);
-    } catch (e) {
-      // Catch errors during UTF-8 conversion (likely due to bad decryption)
-      throw new Error('Decryption failed. Invalid key or corrupt data.');
-    }
-
-    // Check if decryption resulted in an empty string (another failure case)
-    if (!decryptedString) {
-      throw new Error('Decryption failed. Invalid key or corrupt data.');
-    }
+    
+    const decryptedString = decryptData(dataToParse, config.encryptionKey);
 
     try {
       const decryptedData: QueryPayloads = JSON.parse(decryptedString);
@@ -108,14 +155,24 @@ const _useCallback = (config: CallbackConfig) => {
     let urlToParse: string = "";
     if (options?.baseUrl && !options.skipCurrentUrl) {
       urlToParse = options.baseUrl;
-    } else if (window && window.location && !options.skipCurrentUrl) {
+    } else if (typeof window !== "undefined" && window.location && !options.skipCurrentUrl) {
       urlToParse = window.location.toString();
+    } else if (!options?.dataToParse && !options?.baseUrl) {
+      // If no window and no explicit data/baseUrl provided, return undefined
+      return undefined;
     }
 
-    const currentUrl = new URL(urlToParse);
-    const uriDecodedEncryptedData = decodeURI(
-      options?.dataToParse ?? currentUrl?.searchParams.get("data") ?? ""
-    );
+    // If we have dataToParse, use it directly; otherwise parse from URL
+    const uriDecodedEncryptedData = options?.dataToParse 
+      ? decodeURI(options.dataToParse)
+      : (() => {
+          try {
+            const currentUrl = new URL(urlToParse);
+            return decodeURI(currentUrl.searchParams.get("data") ?? "");
+          } catch {
+            return "";
+          }
+        })();
 
     if (!uriDecodedEncryptedData) {
       return undefined;
@@ -124,10 +181,38 @@ const _useCallback = (config: CallbackConfig) => {
     return parse(uriDecodedEncryptedData);
   };
 
+  const generateUrl = (
+    url: string,
+    payload: SendPayloads,
+    sendType?: string,
+    sender?: string
+  ): string => {
+    // generateUrl() works on both server and client
+    // If no sender provided and we're on client, use window.location; otherwise use empty string
+    const defaultSender = sender ?? (
+      typeof window !== "undefined" 
+        ? window.location.href.replace("/Tools/Update", "/Tools")
+        : ""
+    );
+
+    const encryptedMessage = createEncryptedPayload(
+      payload,
+      defaultSender,
+      sendType,
+      config.encryptionKey
+    );
+
+    const destinationUrl = new URL(url);
+    destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
+
+    return destinationUrl.toString();
+  };
+
   return {
     send,
     parse,
     watcher,
+    generateUrl,
   };
 };
 
