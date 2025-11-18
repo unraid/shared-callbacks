@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/unraid/shared-callbacks/compare/v1.1.1...v1.2.0) (2025-11-18)
+
+
+### Features
+
+* add generate function and SSR compat ([#27](https://github.com/unraid/shared-callbacks/issues/27)) ([f21cf3a](https://github.com/unraid/shared-callbacks/commit/f21cf3a03378a3016f1e83dbdf02abd8bd5bdf1f))
+
 ## [1.1.1](https://github.com/unraid/shared-callbacks/compare/v1.1.0...v1.1.1) (2025-05-01)
 
 
