@@ -43,6 +43,63 @@ import type {
   UpcPayload,
 } from "./types.js";
 
+/**
+ * Encrypts a string using AES encryption
+ */
+const encryptData = (data: string, encryptionKey: string): string => {
+  return AES.encrypt(data, encryptionKey).toString();
+};
+
+/**
+ * Decrypts an encrypted string using AES decryption
+ */
+const decryptData = (encryptedData: string, encryptionKey: string): string => {
+  const decryptedMessage = AES.decrypt(encryptedData, encryptionKey);
+
+  let decryptedString: string;
+  try {
+    decryptedString = decryptedMessage.toString(Utf8);
+  } catch (e) {
+    // Catch errors during UTF-8 conversion (likely due to bad decryption)
+    throw new Error('Decryption failed. Invalid key or corrupt data.');
+  }
+
+  // Check if decryption resulted in an empty string (another failure case)
+  if (!decryptedString) {
+    throw new Error('Decryption failed. Invalid key or corrupt data.');
+  }
+
+  return decryptedString;
+};
+
+/**
+ * Stringifies a payload into the standard callback data format
+ */
+const stringifyPayload = (
+  payload: SendPayloads,
+  sender: string,
+  sendType?: string
+): string => {
+  return JSON.stringify({
+    actions: [...payload],
+    sender,
+    type: sendType,
+  });
+};
+
+/**
+ * Creates an encrypted data string from a payload
+ */
+const createEncryptedPayload = (
+  payload: SendPayloads,
+  sender: string,
+  sendType: string | undefined,
+  encryptionKey: string
+): string => {
+  const stringifiedData = stringifyPayload(payload, sender, sendType);
+  return encryptData(stringifiedData, encryptionKey);
+};
+
 const _useCallback = (config: CallbackConfig) => {
   const send = (
     url: string,
@@ -56,16 +113,13 @@ const _useCallback = (config: CallbackConfig) => {
       throw new Error("send() can only be called on the client side");
     }
 
-    const stringifiedData = JSON.stringify({
-      actions: [...payload],
-      sender: sender ?? window.location.href.replace("/Tools/Update", "/Tools"),
-      type: sendType,
-    });
-
-    const encryptedMessage = AES.encrypt(
-      stringifiedData,
+    const defaultSender = sender ?? window.location.href.replace("/Tools/Update", "/Tools");
+    const encryptedMessage = createEncryptedPayload(
+      payload,
+      defaultSender,
+      sendType,
       config.encryptionKey
-    ).toString();
+    );
 
     const destinationUrl = new URL(url.replace("/Tools/Update", "/Tools"));
     destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
@@ -85,20 +139,8 @@ const _useCallback = (config: CallbackConfig) => {
     const dataToParse: string = options?.isDataURIEncoded
       ? decodeURI(data)
       : data;
-    const decryptedMessage = AES.decrypt(dataToParse, config.encryptionKey);
-
-    let decryptedString: string;
-    try {
-      decryptedString = decryptedMessage.toString(Utf8);
-    } catch (e) {
-      // Catch errors during UTF-8 conversion (likely due to bad decryption)
-      throw new Error('Decryption failed. Invalid key or corrupt data.');
-    }
-
-    // Check if decryption resulted in an empty string (another failure case)
-    if (!decryptedString) {
-      throw new Error('Decryption failed. Invalid key or corrupt data.');
-    }
+    
+    const decryptedString = decryptData(dataToParse, config.encryptionKey);
 
     try {
       const decryptedData: QueryPayloads = JSON.parse(decryptedString);
@@ -153,16 +195,12 @@ const _useCallback = (config: CallbackConfig) => {
         : ""
     );
 
-    const stringifiedData = JSON.stringify({
-      actions: [...payload],
-      sender: defaultSender,
-      type: sendType,
-    });
-
-    const encryptedMessage = AES.encrypt(
-      stringifiedData,
+    const encryptedMessage = createEncryptedPayload(
+      payload,
+      defaultSender,
+      sendType,
       config.encryptionKey
-    ).toString();
+    );
 
     const destinationUrl = new URL(url);
     destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));

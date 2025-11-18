@@ -102,6 +102,64 @@ describe('useCallback', () => {
       const decryptedData = callback.parse(encryptedData)
       expect(decryptedData).toEqual(testData)
     })
+
+    it('should use window.location.href when redirectType is null or undefined', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testData = {
+        actions: testActions,
+        sender: 'http://test.com/Tools',
+        type: 'test'
+      }
+      
+      // Mock window.location.href setter to capture the value
+      let hrefValue = ''
+      const originalHref = Object.getOwnPropertyDescriptor(window.location, 'href')
+      Object.defineProperty(window.location, 'href', {
+        set: (val) => { hrefValue = val },
+        get: () => 'http://test.com/Tools/Update',
+        configurable: true
+      })
+      
+      try {
+        callback.send('http://test.com/Tools', testActions, null, 'test', 'http://test.com/Tools')
+        
+        const url = new URL(hrefValue)
+        const encryptedData = url.searchParams.get('data') || ''
+        const decryptedData = callback.parse(encryptedData)
+        expect(decryptedData).toEqual(testData)
+      } finally {
+        // Restore original href property
+        if (originalHref) {
+          Object.defineProperty(window.location, 'href', originalHref)
+        }
+      }
+    })
+
+    it('should normalize /Tools/Update to /Tools in destination URL', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      
+      let hrefValue = ''
+      const originalHref = Object.getOwnPropertyDescriptor(window.location, 'href')
+      Object.defineProperty(window.location, 'href', {
+        set: (val) => { hrefValue = val },
+        get: () => 'http://test.com/Tools/Update',
+        configurable: true
+      })
+      
+      try {
+        callback.send('http://test.com/Tools/Update', testActions, null, 'test', 'http://test.com/Tools')
+        
+        const url = new URL(hrefValue)
+        expect(url.pathname).toBe('/Tools')
+      } finally {
+        // Restore original href property
+        if (originalHref) {
+          Object.defineProperty(window.location, 'href', originalHref)
+        }
+      }
+    })
   })
 
   describe('parse function', () => {
@@ -143,6 +201,31 @@ describe('useCallback', () => {
       
       // Expect parse to throw (likely the decryption error)
       expect(() => callback.parse(invalidData)).toThrow('Decryption failed. Invalid key or corrupt data.');
+    })
+
+    it('should decode URI when isDataURIEncoded option is true', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testData = {
+        actions: testActions,
+        sender: 'http://test.com/Tools',
+        type: 'test'
+      }
+      const stringifiedData = JSON.stringify(testData)
+      const encryptedData = AES.encrypt(stringifiedData, mockConfig.encryptionKey).toString()
+      const uriEncodedData = encodeURI(encryptedData)
+
+      const decryptedData = callback.parse(uriEncodedData, { isDataURIEncoded: true })
+      expect(decryptedData).toEqual(testData)
+    })
+
+    it('should throw an error for malformed JSON after successful decryption', () => {
+      const callback = useCallback(mockConfig)
+      // Create encrypted data that decrypts to invalid JSON
+      const invalidJson = 'not valid json'
+      const encryptedData = AES.encrypt(invalidJson, mockConfig.encryptionKey).toString()
+
+      expect(() => callback.parse(encryptedData)).toThrow('Failed to parse decrypted data.')
     })
   })
 
@@ -230,6 +313,49 @@ describe('useCallback', () => {
 
       // Restore window
       global.window = originalWindow
+    })
+
+    it('should skip current URL when skipCurrentUrl is true but still use dataToParse', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testData = {
+        actions: testActions,
+        sender: 'http://test.com/Tools',
+        type: 'test'
+      }
+      const stringifiedData = JSON.stringify(testData)
+      const encryptedData = AES.encrypt(stringifiedData, mockConfig.encryptionKey).toString()
+
+      // When skipCurrentUrl is true, baseUrl is ignored, so we need to use dataToParse
+      const result = callback.watcher({ skipCurrentUrl: true, dataToParse: encryptedData })
+      expect(result).toEqual(testData)
+    })
+
+    it('should handle invalid URL gracefully in watcher', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testData = {
+        actions: testActions,
+        sender: 'http://test.com/Tools',
+        type: 'test'
+      }
+      const stringifiedData = JSON.stringify(testData)
+      const encryptedData = AES.encrypt(stringifiedData, mockConfig.encryptionKey).toString()
+
+      // Provide invalid URL as baseUrl - should fall back to dataToParse
+      const result = callback.watcher({ 
+        baseUrl: 'not-a-valid-url',
+        dataToParse: encryptedData 
+      })
+      expect(result).toEqual(testData)
+    })
+
+    it('should return undefined when URL parsing fails and no dataToParse is provided', () => {
+      const callback = useCallback(mockConfig)
+      
+      // Provide invalid URL without dataToParse
+      const result = callback.watcher({ baseUrl: 'not-a-valid-url' })
+      expect(result).toBeUndefined()
     })
   })
 
@@ -326,6 +452,36 @@ describe('useCallback', () => {
 
       expect(url.searchParams.get('existing')).toBe('param')
       expect(url.searchParams.has('data')).toBe(true)
+    })
+
+    it('should preserve URL path in generateUrl (no normalization)', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const targetUrl = 'http://test.com/Tools/Update'
+
+      const generatedUrl = callback.generateUrl(targetUrl, testActions, 'forUpc', 'http://sender.com')
+      const url = new URL(generatedUrl)
+
+      // generateUrl does not normalize URLs (unlike send which does)
+      expect(url.pathname).toBe('/Tools/Update')
+      expect(url.searchParams.has('data')).toBe(true)
+    })
+
+    it('should handle empty payload arrays', () => {
+      const callback = useCallback(mockConfig)
+      const emptyActions: ExternalSignOut[] = []
+      const targetUrl = 'http://test.com/c'
+
+      const generatedUrl = callback.generateUrl(targetUrl, emptyActions, 'forUpc', 'http://sender.com')
+      const url = new URL(generatedUrl)
+      const encryptedData = url.searchParams.get('data') || ''
+      const decryptedData = callback.parse(encryptedData)
+
+      expect(decryptedData).toEqual({
+        actions: [],
+        sender: 'http://sender.com',
+        type: 'forUpc'
+      })
     })
   })
 
