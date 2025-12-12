@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/unraid/shared-callbacks/compare/v2.0.1...v2.0.2) (2025-12-12)
+
+
+### Bug Fixes
+
+* update npm ([ca2cbba](https://github.com/unraid/shared-callbacks/commit/ca2cbbafe07ee0482b92f9fd8beaf2367567ce78))
+
 ## [2.0.1](https://github.com/unraid/shared-callbacks/compare/v2.0.0...v2.0.1) (2025-12-12)
 
 
