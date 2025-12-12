@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.3](https://github.com/unraid/shared-callbacks/compare/v2.0.2...v2.0.3) (2025-12-12)
+
+
+### Bug Fixes
+
+* update provenance for publishing ([d06ec01](https://github.com/unraid/shared-callbacks/commit/d06ec01d936fae34eeaf5bc1908701e35223d46e))
+
 ## [2.0.2](https://github.com/unraid/shared-callbacks/compare/v2.0.1...v2.0.2) (2025-12-12)
 
 
