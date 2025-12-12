@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.0](https://github.com/unraid/shared-callbacks/compare/v1.2.0...v2.0.0) (2025-12-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* release as new major due to callback mechanism change
+
+### Features
+
+* enhance callback data handling by supporting URL hash for encrypted data ([#32](https://github.com/unraid/shared-callbacks/issues/32)) ([4114a8e](https://github.com/unraid/shared-callbacks/commit/4114a8e76ab0fc87551238c5ec0fef730d7eef17))
+* release as new major due to callback mechanism change ([e784538](https://github.com/unraid/shared-callbacks/commit/e78453860d9bc852bf651583956fd22c8e07ef76))
+
 ## [1.2.0](https://github.com/unraid/shared-callbacks/compare/v1.1.1...v1.2.0) (2025-11-18)
 
 
