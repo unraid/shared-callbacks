@@ -9,6 +9,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 jobs:
   release-please:
     runs-on: ubuntu-latest
@@ -71,16 +75,9 @@ jobs:
           files: coverage/coverage-final.json
           fail_ci_if_error: false
 
-      - name: Setup NPM Authentication
-        if: ${{ needs.release-please.outputs.release_created }}
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
       - name: Publish to NPM
         if: ${{ needs.release-please.outputs.release_created }}
         run: pnpm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Send Discord notification
         if: ${{ needs.release-please.outputs.release_created }}
