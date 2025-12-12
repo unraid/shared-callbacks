@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/unraid/shared-callbacks/compare/v2.0.0...v2.0.1) (2025-12-12)
+
+
+### Bug Fixes
+
+* use trusted publishing ([e826bd9](https://github.com/unraid/shared-callbacks/commit/e826bd9adf1f3254fb1f21fa4b173bc65d6ff75c))
+
 ## [2.0.0](https://github.com/unraid/shared-callbacks/compare/v1.2.0...v2.0.0) (2025-12-12)
 
 
