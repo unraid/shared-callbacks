@@ -125,7 +125,7 @@ const _useCallback = (config: CallbackConfig) => {
 
     const destinationUrl = new URL(url.replace("/Tools/Update", "/Tools"));
     if (shouldUseHash) {
-      destinationUrl.hash = encodeURI(encryptedMessage);
+      destinationUrl.hash = `data=${encodeURI(encryptedMessage)}`;
     } else {
       destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
     }
@@ -186,11 +186,9 @@ const _useCallback = (config: CallbackConfig) => {
                 ? rawHash.slice(1)
                 : rawHash;
 
-              if (hashWithoutHash.includes("=")) {
-                const hashParams = new URLSearchParams(hashWithoutHash);
-                hashData = hashParams.get("data") ?? "";
-              } else {
-                hashData = hashWithoutHash;
+              // Expect hash in the form `data=<encrypted>` for privacy mode.
+              if (hashWithoutHash.startsWith("data=")) {
+                hashData = hashWithoutHash.slice("data=".length);
               }
             }
 
@@ -231,7 +229,7 @@ const _useCallback = (config: CallbackConfig) => {
 
     const destinationUrl = new URL(url);
     if (shouldUseHash) {
-      destinationUrl.hash = encodeURI(encryptedMessage);
+      destinationUrl.hash = `data=${encodeURI(encryptedMessage)}`;
     } else {
       destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
     }

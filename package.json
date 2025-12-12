@@ -27,17 +27,18 @@
     "@vueuse/core": "^10.9.0 || ^13.0.0"
   },
   "devDependencies": {
-    "@vueuse/core": "^13.0.0",
     "@types/crypto-js": "^4.2.1",
-    "rimraf": "^6.0.0",
     "@vitest/coverage-v8": "^3.1.1",
     "@vue/test-utils": "^2.4.6",
+    "@vueuse/core": "^13.0.0",
+    "rimraf": "^6.0.0",
     "typescript": "^5.3.3",
     "vitest": "^3.1.1"
   },
-  "packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c",
+  "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501",
   "pnpm": {
     "onlyBuiltDependencies": [
+      "esbuild",
       "vue-demi"
     ]
   }

@@ -11,30 +11,41 @@ describe('useCallback', () => {
     encryptionKey: 'test-key'
   }
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks()
-    vi.resetModules()
+
+    // Ensure window exists (JS DOM or stubbed) before importing the module.
+    if (typeof window === 'undefined') {
+      vi.stubGlobal('window', {
+        location: {
+          href: 'http://test.com/Tools/Update',
+          toString: () => 'http://test.com/Tools/Update',
+          replace: vi.fn(),
+        },
+        open: vi.fn(),
+      })
+    }
 
     // Re-import useCallback fresh for each test so configuration
     // (including useHash) can vary per test despite createSharedComposable.
-    return import('../index').then((mod) => {
-      useCallback = mod.useCallback
-    }).then(() => {
-      // Mock window.open
-      vi.spyOn(window, 'open').mockImplementation(() => null)
-      
-      // Mock window.location
-      const mockUrl = new URL('http://test.com/Tools/Update')
-      const mockLocation = {
-        href: mockUrl.toString(),
-        replace: vi.fn(),
-        toString: () => mockUrl.toString(),
-        searchParams: mockUrl.searchParams
-      }
-      Object.defineProperty(window, 'location', {
-        value: mockLocation,
-        writable: true
-      })
+    vi.resetModules()
+    const mod = await import('../index')
+    useCallback = mod.useCallback
+
+    // Mock window.open
+    vi.spyOn(window, 'open').mockImplementation(() => null)
+    
+    // Mock window.location
+    const mockUrl = new URL('http://test.com/Tools/Update')
+    const mockLocation = {
+      href: mockUrl.toString(),
+      replace: vi.fn(),
+      toString: () => mockUrl.toString(),
+      searchParams: mockUrl.searchParams
+    }
+    Object.defineProperty(window, 'location', {
+      value: mockLocation,
+      writable: true
     })
   })
 
@@ -86,7 +97,9 @@ describe('useCallback', () => {
       const url = new URL(urlString)
       
       // Verify the decrypted data
-      const encryptedData = url.hash ? url.hash.slice(1) : ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
       expect(decryptedData).toEqual(testData)
     })
@@ -107,7 +120,9 @@ describe('useCallback', () => {
       const url = new URL(urlString)
       
       // Verify the decrypted data
-      const encryptedData = url.hash ? url.hash.slice(1) : ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
       expect(decryptedData).toEqual(testData)
     })
@@ -134,7 +149,9 @@ describe('useCallback', () => {
         callback.send('http://test.com/Tools', testActions, null, 'test', 'http://test.com/Tools')
         
         const url = new URL(hrefValue)
-        const encryptedData = url.hash ? url.hash.slice(1) : ''
+        const encryptedData = url.hash.startsWith('#data=')
+          ? url.hash.slice('#data='.length)
+          : ''
         const decryptedData = callback.parse(encryptedData)
         expect(decryptedData).toEqual(testData)
       } finally {
@@ -307,7 +324,7 @@ describe('useCallback', () => {
       const uriEncodedData = encodeURI(encryptedData)
 
       const url = new URL('http://test.com/Tools')
-      url.hash = uriEncodedData
+      url.hash = `data=${uriEncodedData}`
 
       const result = callback.watcher({ baseUrl: url.toString() })
       expect(result).toEqual(testData)
@@ -422,7 +439,9 @@ describe('useCallback', () => {
       expect(url.hash).not.toBe('')
 
       // Verify the encrypted data can be decrypted
-      const encryptedData = url.hash ? url.hash.slice(1) : ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
       expect(decryptedData).toEqual({
         actions: testActions,
@@ -440,7 +459,9 @@ describe('useCallback', () => {
       const generatedUrl = callback.generateUrl(targetUrl, testActions, sendType)
       const url = new URL(generatedUrl)
 
-      const encryptedData = url.hash ? url.hash.slice(1) : ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
       
       // Should use window.location.href (mocked to 'http://test.com/Tools/Update')
@@ -461,7 +482,9 @@ describe('useCallback', () => {
       const generatedUrl = callback.generateUrl(targetUrl, testActions, sendType)
       const url = new URL(generatedUrl)
 
-      const encryptedData = url.hash ? url.hash.slice(1) : ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
       
       // Should use empty string when window is not available
@@ -522,7 +545,9 @@ describe('useCallback', () => {
 
       const generatedUrl = callback.generateUrl(targetUrl, emptyActions, 'forUpc', 'http://sender.com')
       const url = new URL(generatedUrl)
-      const encryptedData = url.hash ? url.hash.slice(1) : ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
 
       expect(decryptedData).toEqual({
