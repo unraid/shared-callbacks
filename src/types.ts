@@ -184,4 +184,10 @@ export interface WatcherOptions {
 
 export interface CallbackConfig {
   encryptionKey: string;
+  /**
+   * When true (default), encrypted callback data will be placed in the URL hash
+   * instead of a query parameter to avoid leaking data via referrers.
+   * Set to false to use a query parameter instead.
+   */
+  useHash?: boolean;
 }

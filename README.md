@@ -77,3 +77,22 @@ interface CallbackActionsStore {
   sendType: 'fromUpc' | 'forUpc';
 }
 ```
+
+### URL format configuration
+
+By default, encrypted callback data is now placed in the URL hash (fragment) rather than a query parameter to help prevent sensitive data from being sent in referrers.
+
+You can control this behavior via the `CallbackConfig` passed to `useCallback`:
+
+```ts
+interface CallbackConfig {
+  encryptionKey: string;
+  /**
+   * When true (default), encrypted data is stored in the URL hash.
+   * Set to false to store encrypted data in the `data` query parameter instead.
+   */
+  useHash?: boolean;
+}
+```
+
+Parsing helpers (`parse`, `watcher`) support both formats and will read encrypted data from either the hash or the `data` query parameter.

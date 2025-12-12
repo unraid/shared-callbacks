@@ -1,17 +1,37 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { useCallback } from '../index'
 import { createSharedComposable } from '@vueuse/core'
 import AES from 'crypto-js/aes.js'
 import Utf8 from 'crypto-js/enc-utf8.js'
 import type { ExternalSignOut } from '../types'
+
+let useCallback: any
 
 describe('useCallback', () => {
   const mockConfig = {
     encryptionKey: 'test-key'
   }
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks()
+
+    // Ensure window exists (JS DOM or stubbed) before importing the module.
+    if (typeof window === 'undefined') {
+      vi.stubGlobal('window', {
+        location: {
+          href: 'http://test.com/Tools/Update',
+          toString: () => 'http://test.com/Tools/Update',
+          replace: vi.fn(),
+        },
+        open: vi.fn(),
+      })
+    }
+
+    // Re-import useCallback fresh for each test so configuration
+    // (including useHash) can vary per test despite createSharedComposable.
+    vi.resetModules()
+    const mod = await import('../index')
+    useCallback = mod.useCallback
+
     // Mock window.open
     vi.spyOn(window, 'open').mockImplementation(() => null)
     
@@ -77,7 +97,9 @@ describe('useCallback', () => {
       const url = new URL(urlString)
       
       // Verify the decrypted data
-      const encryptedData = url.searchParams.get('data') || ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
       expect(decryptedData).toEqual(testData)
     })
@@ -98,7 +120,9 @@ describe('useCallback', () => {
       const url = new URL(urlString)
       
       // Verify the decrypted data
-      const encryptedData = url.searchParams.get('data') || ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
       expect(decryptedData).toEqual(testData)
     })
@@ -125,7 +149,9 @@ describe('useCallback', () => {
         callback.send('http://test.com/Tools', testActions, null, 'test', 'http://test.com/Tools')
         
         const url = new URL(hrefValue)
-        const encryptedData = url.searchParams.get('data') || ''
+        const encryptedData = url.hash.startsWith('#data=')
+          ? url.hash.slice('#data='.length)
+          : ''
         const decryptedData = callback.parse(encryptedData)
         expect(decryptedData).toEqual(testData)
       } finally {
@@ -159,6 +185,25 @@ describe('useCallback', () => {
           Object.defineProperty(window.location, 'href', originalHref)
         }
       }
+    })
+
+    it('should support query parameter mode when useHash is false', () => {
+      const callback = useCallback({ encryptionKey: 'test-key', useHash: false })
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testData = {
+        actions: testActions,
+        sender: 'http://test.com/Tools',
+        type: 'test'
+      }
+
+      callback.send('http://test.com/Tools', testActions, 'newTab', 'test', 'http://test.com/Tools')
+
+      const [[urlString]] = (window.open as any).mock.calls
+      const url = new URL(urlString)
+
+      const encryptedData = url.searchParams.get('data') || ''
+      const decryptedData = callback.parse(encryptedData)
+      expect(decryptedData).toEqual(testData)
     })
   })
 
@@ -262,6 +307,26 @@ describe('useCallback', () => {
       // Restore the original URL constructor
       // global.URL = originalURL
       
+      expect(result).toEqual(testData)
+    })
+
+    it('should use baseUrl hash when provided', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testData = {
+        actions: testActions,
+        sender: 'http://test.com/Tools',
+        type: 'test'
+      }
+
+      const stringifiedData = JSON.stringify(testData)
+      const encryptedData = AES.encrypt(stringifiedData, mockConfig.encryptionKey).toString()
+      const uriEncodedData = encodeURI(encryptedData)
+
+      const url = new URL('http://test.com/Tools')
+      url.hash = `data=${uriEncodedData}`
+
+      const result = callback.watcher({ baseUrl: url.toString() })
       expect(result).toEqual(testData)
     })
 
@@ -371,10 +436,12 @@ describe('useCallback', () => {
       const url = new URL(generatedUrl)
 
       expect(url.origin + url.pathname).toBe(targetUrl)
-      expect(url.searchParams.has('data')).toBe(true)
+      expect(url.hash).not.toBe('')
 
       // Verify the encrypted data can be decrypted
-      const encryptedData = url.searchParams.get('data') || ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
       expect(decryptedData).toEqual({
         actions: testActions,
@@ -392,7 +459,9 @@ describe('useCallback', () => {
       const generatedUrl = callback.generateUrl(targetUrl, testActions, sendType)
       const url = new URL(generatedUrl)
 
-      const encryptedData = url.searchParams.get('data') || ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
       
       // Should use window.location.href (mocked to 'http://test.com/Tools/Update')
@@ -413,7 +482,9 @@ describe('useCallback', () => {
       const generatedUrl = callback.generateUrl(targetUrl, testActions, sendType)
       const url = new URL(generatedUrl)
 
-      const encryptedData = url.searchParams.get('data') || ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
       
       // Should use empty string when window is not available
@@ -438,7 +509,7 @@ describe('useCallback', () => {
         const url = new URL(generatedUrl)
         
         expect(url.origin + url.pathname).toBe(targetUrl)
-        expect(url.searchParams.has('data')).toBe(true)
+        expect(url.hash).not.toBe('')
       })
     })
 
@@ -451,7 +522,7 @@ describe('useCallback', () => {
       const url = new URL(generatedUrl)
 
       expect(url.searchParams.get('existing')).toBe('param')
-      expect(url.searchParams.has('data')).toBe(true)
+      expect(url.hash).not.toBe('')
     })
 
     it('should preserve URL path in generateUrl (no normalization)', () => {
@@ -464,7 +535,7 @@ describe('useCallback', () => {
 
       // generateUrl does not normalize URLs (unlike send which does)
       expect(url.pathname).toBe('/Tools/Update')
-      expect(url.searchParams.has('data')).toBe(true)
+      expect(url.hash).not.toBe('')
     })
 
     it('should handle empty payload arrays', () => {
@@ -474,13 +545,37 @@ describe('useCallback', () => {
 
       const generatedUrl = callback.generateUrl(targetUrl, emptyActions, 'forUpc', 'http://sender.com')
       const url = new URL(generatedUrl)
-      const encryptedData = url.searchParams.get('data') || ''
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
 
       expect(decryptedData).toEqual({
         actions: [],
         sender: 'http://sender.com',
         type: 'forUpc'
+      })
+    })
+
+    it('should support query parameter mode in generateUrl when useHash is false', () => {
+      const callback = useCallback({ encryptionKey: 'test-key', useHash: false })
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const targetUrl = 'http://test.com/c'
+      const sendType = 'forUpc'
+      const sender = 'http://test.com/Tools'
+
+      const generatedUrl = callback.generateUrl(targetUrl, testActions, sendType, sender)
+      const url = new URL(generatedUrl)
+
+      expect(url.origin + url.pathname).toBe(targetUrl)
+      expect(url.searchParams.has('data')).toBe(true)
+
+      const encryptedData = url.searchParams.get('data') || ''
+      const decryptedData = callback.parse(encryptedData)
+      expect(decryptedData).toEqual({
+        actions: testActions,
+        sender,
+        type: sendType
       })
     })
   })
@@ -538,7 +633,7 @@ describe('useCallback', () => {
       const url = new URL(generatedUrl)
 
       expect(url.origin + url.pathname).toBe(targetUrl)
-      expect(url.searchParams.has('data')).toBe(true)
+      expect(url.hash).not.toBe('')
 
       // Restore window
       global.window = originalWindow
