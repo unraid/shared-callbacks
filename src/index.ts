@@ -101,6 +101,8 @@ const createEncryptedPayload = (
 };
 
 const _useCallback = (config: CallbackConfig) => {
+  const shouldUseHash = config.useHash !== false;
+
   const send = (
     url: string,
     payload: SendPayloads,
@@ -122,7 +124,11 @@ const _useCallback = (config: CallbackConfig) => {
     );
 
     const destinationUrl = new URL(url.replace("/Tools/Update", "/Tools"));
-    destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
+    if (shouldUseHash) {
+      destinationUrl.hash = encodeURI(encryptedMessage);
+    } else {
+      destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
+    }
 
     if (redirectType === "newTab") {
       window.open(destinationUrl.toString(), "_blank");
@@ -163,12 +169,33 @@ const _useCallback = (config: CallbackConfig) => {
     }
 
     // If we have dataToParse, use it directly; otherwise parse from URL
-    const uriDecodedEncryptedData = options?.dataToParse 
+    const uriDecodedEncryptedData = options?.dataToParse
       ? decodeURI(options.dataToParse)
       : (() => {
           try {
             const currentUrl = new URL(urlToParse);
-            return decodeURI(currentUrl.searchParams.get("data") ?? "");
+
+            // Prefer query param if present to maintain backward compatibility,
+            // but also support hash-based data for enhanced privacy.
+            const searchParamData = currentUrl.searchParams.get("data") ?? "";
+
+            let hashData = "";
+            const rawHash = currentUrl.hash ?? "";
+            if (rawHash) {
+              const hashWithoutHash = rawHash.startsWith("#")
+                ? rawHash.slice(1)
+                : rawHash;
+
+              if (hashWithoutHash.includes("=")) {
+                const hashParams = new URLSearchParams(hashWithoutHash);
+                hashData = hashParams.get("data") ?? "";
+              } else {
+                hashData = hashWithoutHash;
+              }
+            }
+
+            const dataFromUrl = searchParamData || hashData;
+            return decodeURI(dataFromUrl);
           } catch {
             return "";
           }
@@ -203,7 +230,11 @@ const _useCallback = (config: CallbackConfig) => {
     );
 
     const destinationUrl = new URL(url);
-    destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
+    if (shouldUseHash) {
+      destinationUrl.hash = encodeURI(encryptedMessage);
+    } else {
+      destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
+    }
 
     return destinationUrl.toString();
   };
