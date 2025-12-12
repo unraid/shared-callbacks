@@ -1,6 +1,7 @@
 {
   "name": "@unraid/shared-callbacks",
   "version": "2.0.2",
+  "repository": "github:unraid/shared-callbacks",
   "publishConfig": {
     "access": "public"
   },
