@@ -10,9 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  id-token: write  # Required for OIDC
-  contents: write  # Required for release-please to create branches and PRs
-  pull-requests: write  # Required for release-please to create pull requests
+  id-token: write # Required for OIDC
+  contents: write # Required for release-please to create branches and PRs
+  pull-requests: write # Required for release-please to create pull requests
 
 jobs:
   release-please:
@@ -40,6 +40,9 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version-file: ".nvmrc"
+
+      - name: Update npm
+        run: npm install -g npm@latest
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
