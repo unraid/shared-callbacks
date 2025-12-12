@@ -24,13 +24,13 @@
     "crypto-js": "^4.2.0"
   },
   "peerDependencies": {
-    "@vueuse/core": "^10.9.0 || ^13.0.0"
+    "@vueuse/core": "^10.9.0 || ^13.0.0 || ^14.0.0"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.1",
     "@vitest/coverage-v8": "^3.1.1",
     "@vue/test-utils": "^2.4.6",
-    "@vueuse/core": "^13.0.0",
+    "@vueuse/core": "^14.0.0",
     "rimraf": "^6.0.0",
     "typescript": "^5.3.3",
     "vitest": "^3.1.1"
