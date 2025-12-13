@@ -42,7 +42,7 @@ import {
   appendEncryptedDataToUrl,
   createEncryptedPayload,
   parseEncryptedPayload,
-} from "./core";
+} from "./core.js";
 
 /**
  * Server-safe factory that exposes only parse and generateUrl.

@@ -96,7 +96,6 @@ Parsing helpers (`parse`, `watcher`) support both formats and will read encrypte
 To make SSR / Workers usage explicit and safe, the package also exposes split entrypoints:
 
 - `@unraid/shared-callbacks/client` – exports `createCallback` (send, watcher, parse, generateUrl) and all types. This is intended for browser/client-only code.
-- `@unraid/shared-callbacks/client` – exports `createCallback` (send, watcher, parse, generateUrl) and all types. This is intended for browser/client-only code.
 - `@unraid/shared-callbacks/server` – exports `createServerCallback`, which exposes only `parse` and `generateUrl` and never touches browser globals.
 
 Example server usage:

@@ -69,25 +69,21 @@ export const createCallback = (config: CallbackConfig) => {
       config.encryptionKey
     );
 
-    const destinationUrl = new URL(
-      url.replace("/Tools/Update", "/Tools")
+    const destinationUrl = appendEncryptedDataToUrl(
+      url.replace("/Tools/Update", "/Tools"),
+      encryptedMessage,
+      shouldUseHash
     );
 
-    if (shouldUseHash) {
-      destinationUrl.hash = `data=${encodeURI(encryptedMessage)}`;
-    } else {
-      destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
-    }
-
     if (redirectType === "newTab") {
-      window.open(destinationUrl.toString(), "_blank");
+      window.open(destinationUrl, "_blank");
       return;
     }
     if (redirectType === "replace") {
-      window.location.replace(destinationUrl.toString());
+      window.location.replace(destinationUrl);
       return;
     }
-    window.location.href = destinationUrl.toString();
+    window.location.href = destinationUrl;
   };
 
   const parse = (
