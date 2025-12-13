@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/unraid/shared-callbacks/compare/v2.0.3...v3.0.0) (2025-12-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* introduce client and server entrypoints for callback handling ([#37](https://github.com/unraid/shared-callbacks/issues/37))
+
+### Features
+
+* introduce client and server entrypoints for callback handling ([#37](https://github.com/unraid/shared-callbacks/issues/37)) ([8c6eab2](https://github.com/unraid/shared-callbacks/commit/8c6eab204c79ba10fa95756a3e29fd772fb585d5))
+
 ## [2.0.3](https://github.com/unraid/shared-callbacks/compare/v2.0.2...v2.0.3) (2025-12-12)
 
 
