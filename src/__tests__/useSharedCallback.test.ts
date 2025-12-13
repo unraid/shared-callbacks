@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { createSharedComposable } from '@vueuse/core'
 import AES from 'crypto-js/aes.js'
 import Utf8 from 'crypto-js/enc-utf8.js'
 import type { ExternalSignOut } from '../types'
@@ -27,7 +26,7 @@ describe('useCallback', () => {
     }
 
     // Re-import useCallback fresh for each test so configuration
-    // (including useHash) can vary per test despite createSharedComposable.
+    // (including useHash) can vary per test.
     vi.resetModules()
     const mod = await import('../index')
     useCallback = mod.useCallback
@@ -49,7 +48,7 @@ describe('useCallback', () => {
     })
   })
 
-  it('should create a shared callback instance', () => {
+  it('should create a callback instance', () => {
     const callback = useCallback(mockConfig)
     expect(callback).toBeDefined()
     expect(typeof callback.send).toBe('function')
@@ -57,27 +56,10 @@ describe('useCallback', () => {
     expect(typeof callback.watcher).toBe('function')
   })
 
-  it('should maintain the same instance for the same config', () => {
+  it('should create a new instance per call', () => {
     const callback1 = useCallback(mockConfig)
     const callback2 = useCallback(mockConfig)
-    expect(callback1).toBe(callback2)
-  })
-
-  it('should maintain the same instance even with different configs due to createSharedComposable', () => {
-    const callback1 = useCallback({ encryptionKey: 'key1' })
-    const callback2 = useCallback({ encryptionKey: 'key2' })
-    expect(callback1).toBe(callback2)
-  })
-
-  it('should work with createSharedComposable', () => {
-    const useTestComposable = createSharedComposable(() => {
-      return useCallback(mockConfig)
-    })
-
-    const callback1 = useTestComposable()
-    const callback2 = useTestComposable()
-
-    expect(callback1).toBe(callback2)
+    expect(callback1).not.toBe(callback2)
   })
 
   describe('send function', () => {

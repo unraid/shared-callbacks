@@ -42,7 +42,7 @@ var require_core = __commonJS({
         root.CryptoJS = factory();
       }
     })(exports$1, function() {
-      var CryptoJS = CryptoJS || (function(Math2, undefined2) {
+      var CryptoJS = CryptoJS || (function(Math2, undefined$1) {
         var crypto;
         if (typeof window !== "undefined" && window.crypto) {
           crypto = window.crypto;
@@ -210,7 +210,7 @@ var require_core = __commonJS({
            */
           init: function(words, sigBytes) {
             words = this.words = words || [];
-            if (sigBytes != undefined2) {
+            if (sigBytes != undefined$1) {
               this.sigBytes = sigBytes;
             } else {
               this.sigBytes = words.length * 4;
@@ -1226,7 +1226,7 @@ var require_cipher_core = __commonJS({
         factory(root.CryptoJS);
       }
     })(exports$1, function(CryptoJS) {
-      CryptoJS.lib.Cipher || (function(undefined2) {
+      CryptoJS.lib.Cipher || (function(undefined$1) {
         var C = CryptoJS;
         var C_lib = C.lib;
         var Base = C_lib.Base;
@@ -1480,7 +1480,7 @@ var require_cipher_core = __commonJS({
             var iv = this._iv;
             if (iv) {
               block = iv;
-              this._iv = undefined2;
+              this._iv = undefined$1;
             } else {
               block = this._prevBlock;
             }
@@ -2079,90 +2079,26 @@ var appendEncryptedDataToUrl = (url, encryptedData, useHash) => {
   return destinationUrl.toString();
 };
 
-// src/client.ts
-var createCallback = (config) => {
-  const shouldUseHash = config.useHash !== false;
-  const send = (url, payload, redirectType, sendType, sender) => {
-    if (typeof window === "undefined") {
-      throw new Error("send() can only be called on the client side");
-    }
-    const defaultSender = sender ?? window.location.href.replace("/Tools/Update", "/Tools");
-    const encryptedMessage = createEncryptedPayload(
-      payload,
-      defaultSender,
-      sendType,
-      config.encryptionKey
-    );
-    const destinationUrl = new URL(
-      url.replace("/Tools/Update", "/Tools")
-    );
-    if (shouldUseHash) {
-      destinationUrl.hash = `data=${encodeURI(encryptedMessage)}`;
-    } else {
-      destinationUrl.searchParams.set("data", encodeURI(encryptedMessage));
-    }
-    if (redirectType === "newTab") {
-      window.open(destinationUrl.toString(), "_blank");
-      return;
-    }
-    if (redirectType === "replace") {
-      window.location.replace(destinationUrl.toString());
-      return;
-    }
-    window.location.href = destinationUrl.toString();
-  };
+// src/server.ts
+var createServerCallback = (config) => {
   const parse = (data, options) => {
     return parseEncryptedPayload(data, config.encryptionKey, options);
   };
-  const watcher = (options = {}) => {
-    let urlToParse = "";
-    if (options?.baseUrl && !options.skipCurrentUrl) {
-      urlToParse = options.baseUrl;
-    } else if (typeof window !== "undefined" && window.location && !options.skipCurrentUrl) {
-      urlToParse = window.location.toString();
-    } else if (!options?.dataToParse && !options?.baseUrl) {
-      return void 0;
-    }
-    const uriDecodedEncryptedData = options?.dataToParse ? decodeURI(options.dataToParse) : (() => {
-      try {
-        const currentUrl = new URL(urlToParse);
-        const searchParamData = currentUrl.searchParams.get("data") ?? "";
-        let hashData = "";
-        const rawHash = currentUrl.hash ?? "";
-        if (rawHash) {
-          const hashWithoutHash = rawHash.startsWith("#") ? rawHash.slice(1) : rawHash;
-          if (hashWithoutHash.startsWith("data=")) {
-            hashData = hashWithoutHash.slice("data=".length);
-          }
-        }
-        const dataFromUrl = searchParamData || hashData;
-        return decodeURI(dataFromUrl);
-      } catch {
-        return "";
-      }
-    })();
-    if (!uriDecodedEncryptedData) {
-      return void 0;
-    }
-    return parse(uriDecodedEncryptedData);
-  };
   const generateUrl = (url, payload, sendType, sender) => {
-    const defaultSender = sender ?? (typeof window !== "undefined" ? window.location.href.replace("/Tools/Update", "/Tools") : "");
+    const effectiveSender = sender ?? "";
     const encryptedMessage = createEncryptedPayload(
       payload,
-      defaultSender,
+      effectiveSender,
       sendType,
       config.encryptionKey
     );
+    const shouldUseHash = config.useHash !== false;
     return appendEncryptedDataToUrl(url, encryptedMessage, shouldUseHash);
   };
   return {
-    send,
     parse,
-    watcher,
     generateUrl
   };
 };
-var useCallback = createCallback;
 
-export { createCallback, useCallback };
+export { createServerCallback };
