@@ -18,23 +18,17 @@ pnpm add @unraid/shared-callbacks
 ## Usage
 
 ```typescript
-import { createCallbackStore, CallbackActionsStore } from '@unraid/shared-callbacks';
+import { createCallback } from '@unraid/shared-callbacks';
 
-// Define your callback actions store
-const useCallbackActions = (): CallbackActionsStore => ({
-  saveCallbackData: (decryptedData) => {
-    // Handle the decrypted callback data
-    console.log(decryptedData);
-  },
+const callback = createCallback({
   encryptionKey: 'your-encryption-key',
-  sendType: 'forUpc'
+  // Optional: when true (default), encrypted data is stored in the hash
+  // instead of the `data` query parameter.
+  useHash: true,
 });
 
-// Create the callback store
-const callbackStore = createCallbackStore(useCallbackActions);
-
-// Use the store to send callbacks
-callbackStore.send('https://example.com/callback', [
+// Send encrypted callbacks (client-only)
+callback.send('https://example.com/callback', [
   {
     type: 'signIn',
     apiKey: 'your-api-key',
@@ -44,8 +38,8 @@ callbackStore.send('https://example.com/callback', [
   }
 ]);
 
-// Watch for incoming callbacks
-callbackStore.watcher();
+// Watch for incoming callbacks (client-only)
+const decrypted = callback.watcher();
 ```
 
 ## API
@@ -82,7 +76,7 @@ interface CallbackActionsStore {
 
 By default, encrypted callback data is now placed in the URL hash (fragment) rather than a query parameter to help prevent sensitive data from being sent in referrers.
 
-You can control this behavior via the `CallbackConfig` passed to `useCallback`:
+You can control this behavior via the `CallbackConfig` passed to `createCallback`:
 
 ```ts
 interface CallbackConfig {
@@ -96,3 +90,25 @@ interface CallbackConfig {
 ```
 
 Parsing helpers (`parse`, `watcher`) support both formats and will read encrypted data from either the hash or the `data` query parameter.
+
+### Server / client entrypoints
+
+To make SSR / Workers usage explicit and safe, the package also exposes split entrypoints:
+
+- `@unraid/shared-callbacks/client` – exports `createCallback` (send, watcher, parse, generateUrl) and all types. This is intended for browser/client-only code.
+- `@unraid/shared-callbacks/server` – exports `createServerCallback`, which exposes only `parse` and `generateUrl` and never touches browser globals.
+
+Example server usage:
+
+```ts
+import {
+  createServerCallback,
+  type CallbackConfig,
+} from '@unraid/shared-callbacks/server';
+
+const config: CallbackConfig = {
+  encryptionKey: 'your-encryption-key',
+};
+
+const { parse, generateUrl } = createServerCallback(config);
+```

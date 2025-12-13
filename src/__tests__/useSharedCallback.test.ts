@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { createSharedComposable } from '@vueuse/core'
 import AES from 'crypto-js/aes.js'
 import Utf8 from 'crypto-js/enc-utf8.js'
 import type { ExternalSignOut } from '../types'
@@ -27,7 +26,7 @@ describe('useCallback', () => {
     }
 
     // Re-import useCallback fresh for each test so configuration
-    // (including useHash) can vary per test despite createSharedComposable.
+    // (including useHash) can vary per test.
     vi.resetModules()
     const mod = await import('../index')
     useCallback = mod.useCallback
@@ -49,7 +48,7 @@ describe('useCallback', () => {
     })
   })
 
-  it('should create a shared callback instance', () => {
+  it('should create a callback instance', () => {
     const callback = useCallback(mockConfig)
     expect(callback).toBeDefined()
     expect(typeof callback.send).toBe('function')
@@ -57,27 +56,10 @@ describe('useCallback', () => {
     expect(typeof callback.watcher).toBe('function')
   })
 
-  it('should maintain the same instance for the same config', () => {
+  it('should create a new instance per call', () => {
     const callback1 = useCallback(mockConfig)
     const callback2 = useCallback(mockConfig)
-    expect(callback1).toBe(callback2)
-  })
-
-  it('should maintain the same instance even with different configs due to createSharedComposable', () => {
-    const callback1 = useCallback({ encryptionKey: 'key1' })
-    const callback2 = useCallback({ encryptionKey: 'key2' })
-    expect(callback1).toBe(callback2)
-  })
-
-  it('should work with createSharedComposable', () => {
-    const useTestComposable = createSharedComposable(() => {
-      return useCallback(mockConfig)
-    })
-
-    const callback1 = useTestComposable()
-    const callback2 = useTestComposable()
-
-    expect(callback1).toBe(callback2)
+    expect(callback1).not.toBe(callback2)
   })
 
   describe('send function', () => {
@@ -202,6 +184,30 @@ describe('useCallback', () => {
       const url = new URL(urlString)
 
       const encryptedData = url.searchParams.get('data') || ''
+      const decryptedData = callback.parse(encryptedData)
+      expect(decryptedData).toEqual(testData)
+    })
+
+    it('should use window.location.href as default sender when sender is not provided', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testData = {
+        actions: testActions,
+        sender: 'http://test.com/Tools', // Should use window.location.href normalized
+        type: 'test'
+      }
+      
+      // Call send without providing sender parameter (undefined)
+      callback.send('http://test.com/Tools', testActions, 'newTab', 'test')
+      
+      // Get the URL from the spy call
+      const [[urlString]] = (window.open as any).mock.calls
+      const url = new URL(urlString)
+      
+      // Verify the decrypted data uses default sender
+      const encryptedData = url.hash.startsWith('#data=')
+        ? url.hash.slice('#data='.length)
+        : ''
       const decryptedData = callback.parse(encryptedData)
       expect(decryptedData).toEqual(testData)
     })
@@ -330,6 +336,84 @@ describe('useCallback', () => {
       expect(result).toEqual(testData)
     })
 
+    it('should handle hash without # prefix', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testData = {
+        actions: testActions,
+        sender: 'http://test.com/Tools',
+        type: 'test'
+      }
+
+      const stringifiedData = JSON.stringify(testData)
+      const encryptedData = AES.encrypt(stringifiedData, mockConfig.encryptionKey).toString()
+      const uriEncodedData = encodeURI(encryptedData)
+
+      // Mock URL constructor to return an object with hash that doesn't start with "#"
+      // This tests the branch where rawHash doesn't start with "#"
+      const OriginalURL = global.URL
+      global.URL = class MockURL {
+        searchParams: URLSearchParams
+        private _hash: string
+        constructor(url: string) {
+          this.searchParams = new URLSearchParams()
+          // Extract hash from URL string, but store it without "#" prefix
+          const hashMatch = url.match(/#(.+)$/)
+          this._hash = hashMatch ? hashMatch[1] : ''
+        }
+        get hash() {
+          // Return hash without "#" prefix to test the uncovered branch
+          return this._hash
+        }
+        toString() {
+          return `http://test.com/Tools${this._hash ? '#' + this._hash : ''}`
+        }
+      } as any
+
+      try {
+        const baseUrlWithHash = `http://test.com/Tools#data=${uriEncodedData}`
+        const result = callback.watcher({ baseUrl: baseUrlWithHash })
+        expect(result).toEqual(testData)
+      } finally {
+        global.URL = OriginalURL
+      }
+    })
+
+    it('should handle hash without # prefix and without data= prefix', () => {
+      const callback = useCallback(mockConfig)
+      
+      // Mock URL constructor to return an object with hash that doesn't start with "#"
+      // and doesn't start with "data=" to test the uncovered branch at line 133
+      const OriginalURL = global.URL
+      global.URL = class MockURL {
+        searchParams: URLSearchParams
+        private _hash: string
+        constructor(url: string) {
+          this.searchParams = new URLSearchParams()
+          // Extract hash from URL string, but store it without "#" prefix
+          const hashMatch = url.match(/#(.+)$/)
+          this._hash = hashMatch ? hashMatch[1] : ''
+        }
+        get hash() {
+          // Return hash without "#" prefix and without "data=" prefix
+          return this._hash
+        }
+        toString() {
+          return `http://test.com/Tools${this._hash ? '#' + this._hash : ''}`
+        }
+      } as any
+
+      try {
+        // URL with hash that doesn't start with "#" and doesn't start with "data="
+        const baseUrlWithHash = `http://test.com/Tools#someOtherHash=value`
+        const result = callback.watcher({ baseUrl: baseUrlWithHash })
+        // Should return undefined since there's no valid data
+        expect(result).toBeUndefined()
+      } finally {
+        global.URL = OriginalURL
+      }
+    })
+
     it('should use dataToParse when provided', () => {
       const callback = useCallback(mockConfig)
       const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
@@ -421,6 +505,55 @@ describe('useCallback', () => {
       // Provide invalid URL without dataToParse
       const result = callback.watcher({ baseUrl: 'not-a-valid-url' })
       expect(result).toBeUndefined()
+    })
+
+    it('should handle URL with no hash (null/undefined hash)', () => {
+      const callback = useCallback(mockConfig)
+      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testData = {
+        actions: testActions,
+        sender: 'http://test.com/Tools',
+        type: 'test'
+      }
+      
+      // Create URL with data in search params but no hash
+      const stringifiedData = JSON.stringify(testData)
+      const encryptedData = AES.encrypt(stringifiedData, mockConfig.encryptionKey).toString()
+      
+      // Mock URL constructor to return an object with hash as null/undefined
+      const OriginalURL = global.URL
+      global.URL = class MockURL {
+        searchParams: URLSearchParams
+        constructor(url: string) {
+          this.searchParams = new URLSearchParams()
+          // Parse search params from URL string manually
+          const searchMatch = url.match(/\?([^#]*)/)
+          if (searchMatch) {
+            searchMatch[1].split('&').forEach(param => {
+              const [key, value] = param.split('=')
+              if (key) {
+                this.searchParams.set(key, decodeURIComponent(value || ''))
+              }
+            })
+          }
+        }
+        get hash() {
+          // Return null to test the nullish coalescing on line 127
+          return null as any
+        }
+        toString() {
+          const search = this.searchParams.toString()
+          return `http://test.com/Tools${search ? '?' + search : ''}`
+        }
+      } as any
+
+      try {
+        const baseUrl = `http://test.com/Tools?data=${encodeURI(encryptedData)}`
+        const result = callback.watcher({ baseUrl })
+        expect(result).toEqual(testData)
+      } finally {
+        global.URL = OriginalURL
+      }
     })
   })
 
