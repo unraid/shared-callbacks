@@ -90,6 +90,7 @@ export interface ActivationCodeData {
 
 export interface ServerData {
   activationCodeData?: ActivationCodeData | null;
+  connectPluginInstalled?: string;
   description?: string;
   deviceCount?: number;
   expireTime?: number;
