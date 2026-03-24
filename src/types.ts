@@ -73,6 +73,13 @@ export type ServerState =
   | "STALE"
   | undefined;
 
+export type ConnectState =
+  | "PRE_INIT"
+  | "CONNECTING"
+  | "CONNECTED"
+  | "PING_FAILURE"
+  | "ERROR_RETRYING";
+
 export interface ActivationCodeData {
   __typename?: "ActivationCode";
   background?: string | null;
@@ -90,6 +97,8 @@ export interface ActivationCodeData {
 
 export interface ServerData {
   activationCodeData?: ActivationCodeData | null;
+  connectPluginVersion?: string;
+  connectState?: ConnectState;
   description?: string;
   deviceCount?: number;
   expireTime?: number;

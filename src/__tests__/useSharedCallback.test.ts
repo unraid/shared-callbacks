@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import AES from 'crypto-js/aes.js'
 import Utf8 from 'crypto-js/enc-utf8.js'
-import type { ExternalSignOut } from '../types'
+import type { ExternalSignOut, ServerPayload } from '../types'
 
 let useCallback: any
 
@@ -216,7 +216,18 @@ describe('useCallback', () => {
   describe('parse function', () => {
     it('should correctly parse valid encrypted data', () => {
       const callback = useCallback(mockConfig)
-      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testActions: ServerPayload[] = [
+        {
+          type: 'signIn',
+          server: {
+            connectPluginVersion: '2024.05.06.1049',
+            connectState: 'CONNECTED',
+            guid: 'test-guid',
+            registered: false,
+            state: 'ENOCONN',
+          },
+        },
+      ]
       const testData = {
         actions: testActions,
         sender: 'http://test.com/Tools',
@@ -560,7 +571,18 @@ describe('useCallback', () => {
   describe('generateUrl function', () => {
     it('should generate a URL with encrypted data', () => {
       const callback = useCallback(mockConfig)
-      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testActions: ServerPayload[] = [
+        {
+          type: 'signIn',
+          server: {
+            connectPluginVersion: '2024.05.06.1049',
+            connectState: 'CONNECTED',
+            guid: 'test-guid',
+            registered: false,
+            state: 'ENOCONN',
+          },
+        },
+      ]
       const targetUrl = 'http://test.com/c'
       const sendType = 'forUpc'
       const sender = 'http://test.com/Tools'
