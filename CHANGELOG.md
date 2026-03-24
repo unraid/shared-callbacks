@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/unraid/shared-callbacks/compare/v3.0.0...v3.1.0) (2026-03-24)
+
+
+### Features
+
+* **types:** add connect fields to callback ServerData ([#44](https://github.com/unraid/shared-callbacks/issues/44)) ([1f5724f](https://github.com/unraid/shared-callbacks/commit/1f5724ff1f0bf2f0e73b9a8b5bd948061794cdd9))
+
 ## [3.0.0](https://github.com/unraid/shared-callbacks/compare/v2.0.3...v3.0.0) (2025-12-13)
 
 
