@@ -1,4 +1,4 @@
-import type { CallbackConfig, QueryPayloads, SendPayloads, SignIn, SignOut, OemSignOut, Troubleshoot, Recover, Replace, TrialExtend, TrialStart, Purchase, Redeem, Renew, Upgrade, UpdateOs, DowngradeOs, Manage, MyKeys, LinkKey, Activate, AccountActionTypes, AccountKeyActionTypes, PurchaseActionTypes, ServerActionTypes, ServerState, ServerData, UserInfo, ExternalSignIn, ExternalSignOut, ExternalKeyActions, ExternalUpdateOsAction, ServerPayload, ServerTroubleshoot, ExternalActions, UpcActions, ExternalPayload, UpcPayload } from "./types.js";
+import type { CallbackPayloadMetadata, CallbackConfig, QueryPayloads, SendPayloads, SignIn, SignOut, OemSignOut, Troubleshoot, Recover, Replace, TrialExtend, TrialStart, Purchase, Redeem, Renew, Upgrade, UpdateOs, DowngradeOs, Manage, MyKeys, LinkKey, Activate, AccountActionTypes, AccountKeyActionTypes, PurchaseActionTypes, ServerActionTypes, ServerState, ServerData, UserInfo, ExternalSignIn, ExternalSignOut, ExternalKeyActions, ExternalUpdateOsAction, ServerPayload, ServerTroubleshoot, ExternalActions, UpcActions, ExternalPayload, UpcPayload } from "./types.js";
 /**
  * Server-safe factory that exposes only parse and generateUrl.
  *
@@ -9,6 +9,6 @@ export declare const createServerCallback: (config: CallbackConfig) => {
     parse: (data: string, options?: {
         isDataURIEncoded?: boolean;
     }) => QueryPayloads;
-    generateUrl: (url: string, payload: SendPayloads, sendType?: string, sender?: string) => string;
+    generateUrl: (url: string, payload: SendPayloads, sendType?: string, sender?: string, metadata?: CallbackPayloadMetadata) => string;
 };
-export type { CallbackConfig, QueryPayloads, SendPayloads, SignIn, SignOut, OemSignOut, Troubleshoot, Recover, Replace, TrialExtend, TrialStart, Purchase, Redeem, Renew, Upgrade, UpdateOs, DowngradeOs, Manage, MyKeys, LinkKey, Activate, AccountActionTypes, AccountKeyActionTypes, PurchaseActionTypes, ServerActionTypes, ServerState, ServerData, UserInfo, ExternalSignIn, ExternalSignOut, ExternalKeyActions, ExternalUpdateOsAction, ServerPayload, ServerTroubleshoot, ExternalActions, UpcActions, ExternalPayload, UpcPayload, };
+export type { CallbackPayloadMetadata, CallbackConfig, QueryPayloads, SendPayloads, SignIn, SignOut, OemSignOut, Troubleshoot, Recover, Replace, TrialExtend, TrialStart, Purchase, Redeem, Renew, Upgrade, UpdateOs, DowngradeOs, Manage, MyKeys, LinkKey, Activate, AccountActionTypes, AccountKeyActionTypes, PurchaseActionTypes, ServerActionTypes, ServerState, ServerData, UserInfo, ExternalSignIn, ExternalSignOut, ExternalKeyActions, ExternalUpdateOsAction, ServerPayload, ServerTroubleshoot, ExternalActions, UpcActions, ExternalPayload, UpcPayload, };

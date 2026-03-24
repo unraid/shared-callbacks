@@ -2048,15 +2048,17 @@ var decryptData = (encryptedData, encryptionKey) => {
   }
   return decryptedString;
 };
-var stringifyPayload = (payload, sender, sendType) => {
+var stringifyPayload = (payload, sender, sendType, metadata = {}) => {
   return JSON.stringify({
     actions: [...payload],
+    connectPluginVersion: metadata.connectPluginVersion,
+    connectState: metadata.connectState,
     sender,
     type: sendType
   });
 };
-var createEncryptedPayload = (payload, sender, sendType, encryptionKey) => {
-  const stringifiedData = stringifyPayload(payload, sender, sendType);
+var createEncryptedPayload = (payload, sender, sendType, metadata, encryptionKey) => {
+  const stringifiedData = stringifyPayload(payload, sender, sendType, metadata);
   return encryptData(stringifiedData, encryptionKey);
 };
 var parseEncryptedPayload = (encryptedData, encryptionKey, options) => {
@@ -2084,12 +2086,13 @@ var createServerCallback = (config) => {
   const parse = (data, options) => {
     return parseEncryptedPayload(data, config.encryptionKey, options);
   };
-  const generateUrl = (url, payload, sendType, sender) => {
+  const generateUrl = (url, payload, sendType, sender, metadata) => {
     const effectiveSender = sender ?? "";
     const encryptedMessage = createEncryptedPayload(
       payload,
       effectiveSender,
       sendType,
+      metadata,
       config.encryptionKey
     );
     const shouldUseHash = config.useHash !== false;
