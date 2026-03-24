@@ -36,12 +36,7 @@ callback.send('https://example.com/callback', [
       // user info
     }
   }
-], undefined, 'forUpc', undefined, {
-  connectPluginVersion: '2024.05.06.1049',
-  connectState: {
-    connectionStatus: 'CONNECTED',
-  },
-});
+]);
 
 // Watch for incoming callbacks (client-only)
 const decrypted = callback.watcher();
@@ -56,7 +51,6 @@ const decrypted = callback.watcher();
 - `UserInfo` - User information structure
 - `ExternalActions` - Union type of all external actions
 - `UpcActions` - Union type of all UPC actions
-- `CallbackPayloadMetadata` - Optional top-level metadata to include with any callback payload
 - `QueryPayloads` - Union type of all payload types
 
 ### Store Interface

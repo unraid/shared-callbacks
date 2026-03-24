@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { createServerCallback } from '../server'
-import type { ExternalSignOut } from '../types'
+import type { ServerPayload } from '../types'
 
 describe('createServerCallback (server entry)', () => {
   const config = {
@@ -9,18 +9,25 @@ describe('createServerCallback (server entry)', () => {
 
   it('should round-trip data via generateUrl and parse without using window', () => {
     const { parse, generateUrl } = createServerCallback(config)
-    const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+    const testActions: ServerPayload[] = [
+      {
+        type: 'signIn',
+        server: {
+          connectPluginVersion: '2024.05.06.1049',
+          connectState: {
+            connectionStatus: 'CONNECTED',
+          },
+          guid: 'test-guid',
+          registered: false,
+          state: 'ENOCONN',
+        },
+      },
+    ]
     const targetUrl = 'http://test.com/c'
     const sendType = 'forUpc'
     const sender = 'http://sender.com'
-    const metadata = {
-      connectPluginVersion: '2024.05.06.1049',
-      connectState: {
-        connectionStatus: 'CONNECTED',
-      },
-    }
 
-    const generatedUrl = generateUrl(targetUrl, testActions, sendType, sender, metadata)
+    const generatedUrl = generateUrl(targetUrl, testActions, sendType, sender)
     const url = new URL(generatedUrl)
 
     const encryptedData = url.hash.startsWith('#data=')
@@ -31,8 +38,6 @@ describe('createServerCallback (server entry)', () => {
 
     expect(decrypted).toEqual({
       actions: testActions,
-      connectPluginVersion: metadata.connectPluginVersion,
-      connectState: metadata.connectState,
       sender,
       type: sendType,
     })

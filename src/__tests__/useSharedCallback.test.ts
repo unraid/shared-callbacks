@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import AES from 'crypto-js/aes.js'
 import Utf8 from 'crypto-js/enc-utf8.js'
-import type { ExternalSignOut } from '../types'
+import type { ExternalSignOut, ServerPayload } from '../types'
 
 let useCallback: any
 
@@ -66,28 +66,13 @@ describe('useCallback', () => {
     it('should open in new tab when redirectType is newTab', () => {
       const callback = useCallback(mockConfig)
       const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
-      const metadata = {
-        connectPluginVersion: '2024.05.06.1049',
-        connectState: {
-          connectionStatus: 'CONNECTED',
-        }
-      }
       const testData = {
         actions: testActions,
-        connectPluginVersion: metadata.connectPluginVersion,
-        connectState: metadata.connectState,
         sender: 'http://test.com/Tools',
         type: 'test'
       }
       
-      callback.send(
-        'http://test.com/Tools',
-        testActions,
-        'newTab',
-        'test',
-        'http://test.com/Tools',
-        metadata
-      )
+      callback.send('http://test.com/Tools', testActions, 'newTab', 'test', 'http://test.com/Tools')
       
       // Get the URL from the spy call
       const [[urlString]] = (window.open as any).mock.calls
@@ -231,13 +216,22 @@ describe('useCallback', () => {
   describe('parse function', () => {
     it('should correctly parse valid encrypted data', () => {
       const callback = useCallback(mockConfig)
-      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testActions: ServerPayload[] = [
+        {
+          type: 'signIn',
+          server: {
+            connectPluginVersion: '2024.05.06.1049',
+            connectState: {
+              connectionStatus: 'CONNECTED',
+            },
+            guid: 'test-guid',
+            registered: false,
+            state: 'ENOCONN',
+          },
+        },
+      ]
       const testData = {
         actions: testActions,
-        connectPluginVersion: '2024.05.06.1049',
-        connectState: {
-          connectionStatus: 'CONNECTED',
-        },
         sender: 'http://test.com/Tools',
         type: 'test'
       }
@@ -579,24 +573,25 @@ describe('useCallback', () => {
   describe('generateUrl function', () => {
     it('should generate a URL with encrypted data', () => {
       const callback = useCallback(mockConfig)
-      const testActions: ExternalSignOut[] = [{ type: 'signOut' }]
+      const testActions: ServerPayload[] = [
+        {
+          type: 'signIn',
+          server: {
+            connectPluginVersion: '2024.05.06.1049',
+            connectState: {
+              connectionStatus: 'CONNECTED',
+            },
+            guid: 'test-guid',
+            registered: false,
+            state: 'ENOCONN',
+          },
+        },
+      ]
       const targetUrl = 'http://test.com/c'
       const sendType = 'forUpc'
       const sender = 'http://test.com/Tools'
-      const metadata = {
-        connectPluginVersion: '2024.05.06.1049',
-        connectState: {
-          connectionStatus: 'CONNECTED',
-        }
-      }
 
-      const generatedUrl = callback.generateUrl(
-        targetUrl,
-        testActions,
-        sendType,
-        sender,
-        metadata
-      )
+      const generatedUrl = callback.generateUrl(targetUrl, testActions, sendType, sender)
       const url = new URL(generatedUrl)
 
       expect(url.origin + url.pathname).toBe(targetUrl)
@@ -609,8 +604,6 @@ describe('useCallback', () => {
       const decryptedData = callback.parse(encryptedData)
       expect(decryptedData).toEqual({
         actions: testActions,
-        connectPluginVersion: metadata.connectPluginVersion,
-        connectState: metadata.connectState,
         sender,
         type: sendType
       })

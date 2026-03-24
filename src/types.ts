@@ -90,6 +90,8 @@ export interface ActivationCodeData {
 
 export interface ServerData {
   activationCodeData?: ActivationCodeData | null;
+  connectPluginVersion?: string;
+  connectState?: JsonValue;
   description?: string;
   deviceCount?: number;
   expireTime?: number;
@@ -165,25 +167,16 @@ export type SendPayloads = ExternalActions[] | UpcActions[];
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue | undefined };
 
-export interface CallbackPayloadMetadata {
-  connectPluginVersion?: string;
-  connectState?: JsonValue;
-}
-
 export interface ExternalPayload {
   type: "forUpc";
   actions: ExternalActions[];
   sender: string;
-  connectPluginVersion?: string;
-  connectState?: JsonValue;
 }
 
 export interface UpcPayload {
   actions: UpcActions[];
   sender: string;
   type: "fromUpc";
-  connectPluginVersion?: string;
-  connectState?: JsonValue;
 }
 
 export type QueryPayloads = ExternalPayload | UpcPayload;

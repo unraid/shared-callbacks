@@ -1,10 +1,6 @@
 import AES from "crypto-js/aes.js";
 import Utf8 from "crypto-js/enc-utf8.js";
-import type {
-  CallbackPayloadMetadata,
-  QueryPayloads,
-  SendPayloads,
-} from "./types";
+import type { QueryPayloads, SendPayloads } from "./types";
 
 /**
  * Encrypts a string using AES encryption.
@@ -43,13 +39,10 @@ export const decryptData = (
 export const stringifyPayload = (
   payload: SendPayloads,
   sender: string,
-  sendType?: string,
-  metadata: CallbackPayloadMetadata = {}
+  sendType?: string
 ): string => {
   return JSON.stringify({
     actions: [...payload],
-    connectPluginVersion: metadata.connectPluginVersion,
-    connectState: metadata.connectState,
     sender,
     type: sendType,
   });
@@ -62,10 +55,9 @@ export const createEncryptedPayload = (
   payload: SendPayloads,
   sender: string,
   sendType: string | undefined,
-  metadata: CallbackPayloadMetadata | undefined,
   encryptionKey: string
 ): string => {
-  const stringifiedData = stringifyPayload(payload, sender, sendType, metadata);
+  const stringifiedData = stringifyPayload(payload, sender, sendType);
   return encryptData(stringifiedData, encryptionKey);
 };
 

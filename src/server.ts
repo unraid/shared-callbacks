@@ -1,5 +1,4 @@
 import type {
-  CallbackPayloadMetadata,
   CallbackConfig,
   QueryPayloads,
   SendPayloads,
@@ -63,15 +62,13 @@ export const createServerCallback = (config: CallbackConfig) => {
     url: string,
     payload: SendPayloads,
     sendType?: string,
-    sender?: string,
-    metadata?: CallbackPayloadMetadata
+    sender?: string
   ): string => {
     const effectiveSender = sender ?? "";
     const encryptedMessage = createEncryptedPayload(
       payload,
       effectiveSender,
       sendType,
-      metadata,
       config.encryptionKey
     );
 
@@ -87,7 +84,6 @@ export const createServerCallback = (config: CallbackConfig) => {
 
 // Re-export all types for convenience from the server entry.
 export type {
-  CallbackPayloadMetadata,
   CallbackConfig,
   QueryPayloads,
   SendPayloads,

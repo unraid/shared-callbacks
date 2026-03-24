@@ -1,5 +1,4 @@
 import type {
-  CallbackPayloadMetadata,
   CallbackConfig,
   QueryPayloads,
   SendPayloads,
@@ -54,8 +53,7 @@ export const createCallback = (config: CallbackConfig) => {
     payload: SendPayloads,
     redirectType?: "newTab" | "replace" | null,
     sendType?: string,
-    sender?: string,
-    metadata?: CallbackPayloadMetadata
+    sender?: string
   ) => {
     if (typeof window === "undefined") {
       throw new Error("send() can only be called on the client side");
@@ -68,7 +66,6 @@ export const createCallback = (config: CallbackConfig) => {
       payload,
       defaultSender,
       sendType,
-      metadata,
       config.encryptionKey
     );
 
@@ -152,8 +149,7 @@ export const createCallback = (config: CallbackConfig) => {
     url: string,
     payload: SendPayloads,
     sendType?: string,
-    sender?: string,
-    metadata?: CallbackPayloadMetadata
+    sender?: string
   ): string => {
     const defaultSender =
       sender ??
@@ -165,7 +161,6 @@ export const createCallback = (config: CallbackConfig) => {
       payload,
       defaultSender,
       sendType,
-      metadata,
       config.encryptionKey
     );
 
@@ -188,7 +183,6 @@ export const useCallback = createCallback;
 
 // Re-export all types for convenience from the client entry.
 export type {
-  CallbackPayloadMetadata,
   CallbackConfig,
   QueryPayloads,
   SendPayloads,

@@ -1,4 +1,4 @@
-import type { CallbackPayloadMetadata, QueryPayloads, SendPayloads } from "./types";
+import type { QueryPayloads, SendPayloads } from "./types";
 /**
  * Encrypts a string using AES encryption.
  */
@@ -11,11 +11,11 @@ export declare const decryptData: (encryptedData: string, encryptionKey: string)
 /**
  * Stringifies a payload into the standard callback data format.
  */
-export declare const stringifyPayload: (payload: SendPayloads, sender: string, sendType?: string, metadata?: CallbackPayloadMetadata) => string;
+export declare const stringifyPayload: (payload: SendPayloads, sender: string, sendType?: string) => string;
 /**
  * Creates an encrypted data string from a payload.
  */
-export declare const createEncryptedPayload: (payload: SendPayloads, sender: string, sendType: string | undefined, metadata: CallbackPayloadMetadata | undefined, encryptionKey: string) => string;
+export declare const createEncryptedPayload: (payload: SendPayloads, sender: string, sendType: string | undefined, encryptionKey: string) => string;
 /**
  * Parses an encrypted callback payload string into its typed structure.
  */
