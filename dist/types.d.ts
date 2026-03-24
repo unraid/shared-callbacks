@@ -21,6 +21,7 @@ export type AccountKeyActionTypes = Recover | Replace | TrialExtend | TrialStart
 export type PurchaseActionTypes = Purchase | Redeem | Renew | Upgrade | Activate;
 export type ServerActionTypes = AccountActionTypes | AccountKeyActionTypes | PurchaseActionTypes;
 export type ServerState = "BASIC" | "PLUS" | "PRO" | "TRIAL" | "EEXPIRED" | "ENOKEYFILE" | "EGUID" | "EGUID1" | "ETRIAL" | "ENOKEYFILE2" | "ENOKEYFILE1" | "ENOFLASH" | "ENOFLASH1" | "ENOFLASH2" | "ENOFLASH3" | "ENOFLASH4" | "ENOFLASH5" | "ENOFLASH6" | "ENOFLASH7" | "EBLACKLISTED" | "EBLACKLISTED1" | "EBLACKLISTED2" | "ENOCONN" | "STARTER" | "UNLEASHED" | "LIFETIME" | "STALE" | undefined;
+export type ConnectState = "PRE_INIT" | "CONNECTING" | "CONNECTED" | "PING_FAILURE" | "ERROR_RETRYING";
 export interface ActivationCodeData {
     __typename?: "ActivationCode";
     background?: string | null;
@@ -38,7 +39,7 @@ export interface ActivationCodeData {
 export interface ServerData {
     activationCodeData?: ActivationCodeData | null;
     connectPluginVersion?: string;
-    connectState?: JsonValue;
+    connectState?: ConnectState;
     description?: string;
     deviceCount?: number;
     expireTime?: number;
@@ -96,10 +97,6 @@ export interface ServerTroubleshoot {
 export type ExternalActions = ExternalSignIn | ExternalSignOut | ExternalKeyActions | ExternalUpdateOsAction;
 export type UpcActions = ServerPayload | ServerTroubleshoot;
 export type SendPayloads = ExternalActions[] | UpcActions[];
-export type JsonPrimitive = string | number | boolean | null;
-export type JsonValue = JsonPrimitive | JsonValue[] | {
-    [key: string]: JsonValue | undefined;
-};
 export interface ExternalPayload {
     type: "forUpc";
     actions: ExternalActions[];

@@ -73,6 +73,13 @@ export type ServerState =
   | "STALE"
   | undefined;
 
+export type ConnectState =
+  | "PRE_INIT"
+  | "CONNECTING"
+  | "CONNECTED"
+  | "PING_FAILURE"
+  | "ERROR_RETRYING";
+
 export interface ActivationCodeData {
   __typename?: "ActivationCode";
   background?: string | null;
@@ -91,7 +98,7 @@ export interface ActivationCodeData {
 export interface ServerData {
   activationCodeData?: ActivationCodeData | null;
   connectPluginVersion?: string;
-  connectState?: JsonValue;
+  connectState?: ConnectState;
   description?: string;
   deviceCount?: number;
   expireTime?: number;
@@ -163,9 +170,6 @@ export type ExternalActions =
 export type UpcActions = ServerPayload | ServerTroubleshoot;
 
 export type SendPayloads = ExternalActions[] | UpcActions[];
-
-export type JsonPrimitive = string | number | boolean | null;
-export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue | undefined };
 
 export interface ExternalPayload {
   type: "forUpc";

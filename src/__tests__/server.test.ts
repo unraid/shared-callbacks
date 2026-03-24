@@ -14,9 +14,7 @@ describe('createServerCallback (server entry)', () => {
         type: 'signIn',
         server: {
           connectPluginVersion: '2024.05.06.1049',
-          connectState: {
-            connectionStatus: 'CONNECTED',
-          },
+          connectState: 'CONNECTED',
           guid: 'test-guid',
           registered: false,
           state: 'ENOCONN',
