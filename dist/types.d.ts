@@ -16,6 +16,7 @@ export type Manage = "manage";
 export type MyKeys = "myKeys";
 export type LinkKey = "linkKey";
 export type Activate = "activate";
+export type CommunityApps = "communityApps";
 export type AccountActionTypes = Troubleshoot | SignIn | SignOut | OemSignOut | Manage | MyKeys | LinkKey;
 export type AccountKeyActionTypes = Recover | Replace | TrialExtend | TrialStart | UpdateOs | DowngradeOs;
 export type PurchaseActionTypes = Purchase | Redeem | Renew | Upgrade | Activate;
@@ -94,8 +95,19 @@ export interface ServerTroubleshoot {
     type: Troubleshoot;
     server: ServerData;
 }
+export interface CommunityAppsLaunch {
+    type: CommunityApps;
+    server: ServerData;
+    installUrl?: string;
+    installUrlTemplate?: string;
+    installParam?: string;
+    installTarget?: string;
+    path?: string;
+    theme?: string;
+    locale?: string;
+}
 export type ExternalActions = ExternalSignIn | ExternalSignOut | ExternalKeyActions | ExternalUpdateOsAction;
-export type UpcActions = ServerPayload | ServerTroubleshoot;
+export type UpcActions = ServerPayload | ServerTroubleshoot | CommunityAppsLaunch;
 export type SendPayloads = ExternalActions[] | UpcActions[];
 export interface ExternalPayload {
     type: "forUpc";
