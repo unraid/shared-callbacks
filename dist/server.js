@@ -2029,6 +2029,13 @@ var require_enc_utf8 = __commonJS({
   }
 });
 
+// src/types.ts
+var CommunityAppsInstalledAppStatus = /* @__PURE__ */ ((CommunityAppsInstalledAppStatus2) => {
+  CommunityAppsInstalledAppStatus2[CommunityAppsInstalledAppStatus2["Installed"] = 1] = "Installed";
+  CommunityAppsInstalledAppStatus2[CommunityAppsInstalledAppStatus2["PreviouslyInstalled"] = 2] = "PreviouslyInstalled";
+  return CommunityAppsInstalledAppStatus2;
+})(CommunityAppsInstalledAppStatus || {});
+
 // src/core.ts
 var import_aes = __toESM(require_aes());
 var import_enc_utf8 = __toESM(require_enc_utf8());
@@ -2101,4 +2108,4 @@ var createServerCallback = (config) => {
   };
 };
 
-export { createServerCallback };
+export { CommunityAppsInstalledAppStatus, createServerCallback };

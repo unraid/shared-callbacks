@@ -50,14 +50,17 @@ const decrypted = callback.watcher();
 - `ServerData` - Server information structure
 - `UserInfo` - User information structure
 - `CommunityAppsLaunch` - Unraid OS to Community Apps iframe launch action
-- `CommunityAppsInstalledApps` - Explicit opt-in installed app fingerprints for local CA installed-state UI
+- `CommunityAppsInstalledApps` - Explicit opt-in installed app status map for local CA installed-state UI
+- `CommunityAppsInstalledAppStatus` - Compact installed app status enum (`Installed = 1`, `PreviouslyInstalled = 2`)
 - `ExternalActions` - Union type of all external actions
 - `UpcActions` - Union type of all UPC actions
 - `QueryPayloads` - Union type of all payload types
 
 `CommunityAppsLaunch.installedApps` should be omitted by default. Include it
 only after the user opts into local installed-state UI, with `enabled: true`,
-`algorithm: "sha256"`, a launch-specific `salt`, and salted fingerprint `keys`.
+`algorithm: "sha256-128"`, a launch-specific `salt`, and an `apps` status map.
+Each app key should be a salted SHA-256 fingerprint truncated to 128 bits and
+encoded as unpadded base64url, producing a fixed 22-character key.
 
 ### Store Interface
 

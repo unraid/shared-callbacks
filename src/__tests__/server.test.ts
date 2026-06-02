@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createServerCallback } from '../server'
+import { CommunityAppsInstalledAppStatus, createServerCallback } from '../server'
 import type { CommunityAppsLaunch, ServerPayload } from '../types'
 
 describe('createServerCallback (server entry)', () => {
@@ -87,9 +87,12 @@ describe('createServerCallback (server entry)', () => {
         installTarget: '_top',
         installedApps: {
           enabled: true,
-          algorithm: 'sha256',
+          algorithm: 'sha256-128',
           salt: 'launch-salt',
-          keys: ['sha256:installed-app-fingerprint'],
+          apps: {
+            'a23456789012345678901A': CommunityAppsInstalledAppStatus.Installed,
+            'b23456789012345678901B': CommunityAppsInstalledAppStatus.PreviouslyInstalled,
+          },
         },
         path: '/apps',
         theme: 'dark',

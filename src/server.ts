@@ -36,6 +36,8 @@ import type {
   ServerPayload,
   ServerTroubleshoot,
   CommunityAppsInstalledAppsAlgorithm,
+  CommunityAppsInstalledAppHash,
+  CommunityAppsInstalledAppStatusMap,
   CommunityAppsInstalledApps,
   CommunityAppsLaunch,
   ExternalActions,
@@ -43,6 +45,7 @@ import type {
   ExternalPayload,
   UpcPayload,
 } from "./types.js";
+import { CommunityAppsInstalledAppStatus } from "./types.js";
 import {
   appendEncryptedDataToUrl,
   createEncryptedPayload,
@@ -87,6 +90,8 @@ export const createServerCallback = (config: CallbackConfig) => {
   };
 };
 
+export { CommunityAppsInstalledAppStatus };
+
 // Re-export all types for convenience from the server entry.
 export type {
   CallbackConfig,
@@ -126,6 +131,8 @@ export type {
   ServerPayload,
   ServerTroubleshoot,
   CommunityAppsInstalledAppsAlgorithm,
+  CommunityAppsInstalledAppHash,
+  CommunityAppsInstalledAppStatusMap,
   CommunityAppsInstalledApps,
   CommunityAppsLaunch,
   ExternalActions,
