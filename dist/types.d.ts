@@ -95,12 +95,18 @@ export interface ServerTroubleshoot {
     type: Troubleshoot;
     server: ServerData;
 }
-export type CommunityAppsInstalledAppsAlgorithm = "sha256";
+export type CommunityAppsInstalledAppsAlgorithm = "sha256-128";
+export declare enum CommunityAppsInstalledAppStatus {
+    Installed = 1,
+    PreviouslyInstalled = 2
+}
+export type CommunityAppsInstalledAppHash = string;
+export type CommunityAppsInstalledAppStatusMap = Record<CommunityAppsInstalledAppHash, CommunityAppsInstalledAppStatus>;
 export interface CommunityAppsInstalledApps {
     enabled: true;
     algorithm: CommunityAppsInstalledAppsAlgorithm;
     salt: string;
-    keys: string[];
+    apps: CommunityAppsInstalledAppStatusMap;
 }
 export interface CommunityAppsLaunch {
     type: CommunityApps;
