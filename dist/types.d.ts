@@ -95,9 +95,17 @@ export interface ServerTroubleshoot {
     type: Troubleshoot;
     server: ServerData;
 }
+export type CommunityAppsInstalledAppsAlgorithm = "sha256";
+export interface CommunityAppsInstalledApps {
+    enabled: true;
+    algorithm: CommunityAppsInstalledAppsAlgorithm;
+    salt: string;
+    keys: string[];
+}
 export interface CommunityAppsLaunch {
     type: CommunityApps;
     server: ServerData;
+    installedApps?: CommunityAppsInstalledApps;
     installUrl?: string;
     installUrlTemplate?: string;
     installParam?: string;
