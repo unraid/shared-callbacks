@@ -49,6 +49,7 @@ const decrypted = callback.watcher();
 - `SignIn`, `SignOut`, `OemSignOut`, etc. - Various callback action types
 - `ServerData` - Server information structure
 - `UserInfo` - User information structure
+- `CommunityAppsLaunch` - Unraid OS to Community Apps iframe launch action
 - `ExternalActions` - Union type of all external actions
 - `UpcActions` - Union type of all UPC actions
 - `QueryPayloads` - Union type of all payload types

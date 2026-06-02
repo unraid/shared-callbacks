@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { createServerCallback } from '../server'
-import type { ServerPayload } from '../types'
+import type { CommunityAppsLaunch, ServerPayload } from '../types'
 
 describe('createServerCallback (server entry)', () => {
   const config = {
@@ -66,6 +66,40 @@ describe('createServerCallback (server entry)', () => {
       actions: testActions,
       sender: '',
       type: 'forUpc',
+    })
+  })
+
+  it('should round-trip a Community Apps launch action', () => {
+    const { parse, generateUrl } = createServerCallback(config)
+    const testActions: CommunityAppsLaunch[] = [
+      {
+        type: 'communityApps',
+        server: {
+          connectPluginVersion: '2024.05.06.1049',
+          connectState: 'CONNECTED',
+          guid: 'test-guid',
+          name: 'Tower',
+          osVersion: '7.2.0',
+          registered: true,
+          state: 'STARTER',
+        },
+        installUrlTemplate: '/Apps/AddContainer?xmlTemplate={templateUrl}',
+        installTarget: '_top',
+        path: '/apps',
+        theme: 'dark',
+      },
+    ]
+
+    const generatedUrl = generateUrl('https://ca.unraid.net/apps', testActions, 'fromUpc', 'https://tower.local/redirect?target=%2Fapps')
+    const url = new URL(generatedUrl)
+    const encryptedData = url.hash.startsWith('#data=')
+      ? url.hash.slice('#data='.length)
+      : url.searchParams.get('data') || ''
+
+    expect(parse(encryptedData)).toEqual({
+      actions: testActions,
+      sender: 'https://tower.local/redirect?target=%2Fapps',
+      type: 'fromUpc',
     })
   })
 })
