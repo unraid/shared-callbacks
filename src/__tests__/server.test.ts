@@ -85,6 +85,12 @@ describe('createServerCallback (server entry)', () => {
         },
         installUrlTemplate: '/Apps/AddContainer?xmlTemplate={templateUrl}',
         installTarget: '_top',
+        installedApps: {
+          enabled: true,
+          algorithm: 'sha256',
+          salt: 'launch-salt',
+          keys: ['sha256:installed-app-fingerprint'],
+        },
         path: '/apps',
         theme: 'dark',
       },
