@@ -94,8 +94,26 @@ describe('createServerCallback (server entry)', () => {
           mode: 'lookup',
           salt: 'launch-salt',
         },
+        installAction: {
+          mode: 'postMessage',
+          method: 'requestInstall',
+          type: 'communityApps.installDocker',
+        },
         path: '/apps',
-        theme: 'dark',
+        theme: {
+          colorMode: 'dark',
+          dark: {
+            '--color-base-100': '#101014',
+            '--color-primary': 'oklch(62% 0.21 252)',
+          },
+          light: {
+            '--color-base-100': '#ffffff',
+            '--color-primary': '#0066cc',
+          },
+          shared: {
+            '--radius-box': '0.375rem',
+          },
+        },
       },
     ]
 

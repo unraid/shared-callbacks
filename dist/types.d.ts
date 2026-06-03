@@ -117,6 +117,14 @@ export interface CommunityAppsInstalledAppsLookup extends CommunityAppsInstalled
     mode: "lookup";
 }
 export type CommunityAppsInstalledApps = CommunityAppsInstalledAppsBatch | CommunityAppsInstalledAppsLookup;
+export type CommunityAppsThemeColorMode = "system" | "light" | "dark";
+export type CommunityAppsThemeVariables = Record<string, string>;
+export interface CommunityAppsThemePayload {
+    colorMode?: CommunityAppsThemeColorMode;
+    light?: CommunityAppsThemeVariables;
+    dark?: CommunityAppsThemeVariables;
+    shared?: CommunityAppsThemeVariables;
+}
 export interface CommunityAppsInstalledAppStatusRequest {
     algorithm: CommunityAppsInstalledAppsAlgorithm;
     salt: string;
@@ -125,16 +133,34 @@ export interface CommunityAppsInstalledAppStatusRequest {
 export interface CommunityAppsInstalledAppStatusResponse {
     apps: CommunityAppsInstalledAppStatusMap;
 }
+export type CommunityAppsInstallActionType = "communityApps.installDocker";
+export interface CommunityAppsInstallBridgeAction {
+    mode: "postMessage";
+    method: "requestInstall";
+    type: CommunityAppsInstallActionType;
+}
+export interface CommunityAppsInstallRequest {
+    type: CommunityAppsInstallActionType;
+    templateUrl: string;
+    appId?: string;
+    appName?: string;
+}
+export interface CommunityAppsInstallResponse {
+    accepted: boolean;
+    reviewRequestId?: string;
+    reason?: string;
+}
 export interface CommunityAppsLaunch {
     type: CommunityApps;
     server: ServerData;
     installedApps?: CommunityAppsInstalledApps;
+    installAction?: CommunityAppsInstallBridgeAction;
     installUrl?: string;
     installUrlTemplate?: string;
     installParam?: string;
     installTarget?: string;
     path?: string;
-    theme?: string;
+    theme?: CommunityAppsThemeColorMode | CommunityAppsThemePayload;
     locale?: string;
 }
 export type ExternalActions = ExternalSignIn | ExternalSignOut | ExternalKeyActions | ExternalUpdateOsAction;

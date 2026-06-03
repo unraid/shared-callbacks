@@ -1,6 +1,7 @@
-import type { CommunityAppsInstalledAppStatusRequest, CommunityAppsInstalledAppStatusResponse } from "./types.js";
+import type { CommunityAppsInstallRequest, CommunityAppsInstallResponse, CommunityAppsInstalledAppStatusRequest, CommunityAppsInstalledAppStatusResponse } from "./types.js";
 export type CommunityAppsInstalledAppsHostMethods = {
     getInstalledAppStatuses: (request: CommunityAppsInstalledAppStatusRequest) => CommunityAppsInstalledAppStatusResponse | Promise<CommunityAppsInstalledAppStatusResponse>;
+    requestInstall?: (request: CommunityAppsInstallRequest) => CommunityAppsInstallResponse | Promise<CommunityAppsInstallResponse>;
 };
 export type CommunityAppsInstalledAppsHostBridge = {
     close: () => void;

@@ -3,6 +3,8 @@ import {
   WindowMessenger,
 } from "post-me";
 import type {
+  CommunityAppsInstallRequest,
+  CommunityAppsInstallResponse,
   CommunityAppsInstalledAppStatusRequest,
   CommunityAppsInstalledAppStatusResponse,
 } from "./types.js";
@@ -13,6 +15,9 @@ export type CommunityAppsInstalledAppsHostMethods = {
   ) =>
     | CommunityAppsInstalledAppStatusResponse
     | Promise<CommunityAppsInstalledAppStatusResponse>;
+  requestInstall?: (
+    request: CommunityAppsInstallRequest
+  ) => CommunityAppsInstallResponse | Promise<CommunityAppsInstallResponse>;
 };
 
 export type CommunityAppsInstalledAppsHostBridge = {
