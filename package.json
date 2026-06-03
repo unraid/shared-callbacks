@@ -41,7 +41,8 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "crypto-js": "^4.2.0"
+    "crypto-js": "^4.2.0",
+    "post-me": "^0.4.5"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.1",

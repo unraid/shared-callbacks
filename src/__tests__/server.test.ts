@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { CommunityAppsInstalledAppStatus, createServerCallback } from '../server'
+import {
+  createCommunityAppsInstalledAppHash,
+  createServerCallback,
+} from '../server'
 import type { CommunityAppsLaunch, ServerPayload } from '../types'
 
 describe('createServerCallback (server entry)', () => {
@@ -88,11 +91,8 @@ describe('createServerCallback (server entry)', () => {
         installedApps: {
           enabled: true,
           algorithm: 'sha256-128',
+          mode: 'lookup',
           salt: 'launch-salt',
-          apps: {
-            'a23456789012345678901A': CommunityAppsInstalledAppStatus.Installed,
-            'b23456789012345678901B': CommunityAppsInstalledAppStatus.PreviouslyInstalled,
-          },
         },
         path: '/apps',
         theme: 'dark',
@@ -110,5 +110,15 @@ describe('createServerCallback (server entry)', () => {
       sender: 'https://tower.local/redirect?target=%2Fapps',
       type: 'fromUpc',
     })
+  })
+
+  it('should create fixed-length Community Apps installed app hashes', () => {
+    const first = createCommunityAppsInstalledAppHash('https://example.com/template.xml', 'launch-salt')
+    const second = createCommunityAppsInstalledAppHash('https://example.com/template.xml', 'other-salt')
+
+    expect(first).toHaveLength(22)
+    expect(first).toMatch(/^[A-Za-z0-9_-]{22}$/)
+    expect(second).toHaveLength(22)
+    expect(second).not.toBe(first)
   })
 })

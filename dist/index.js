@@ -1,3 +1,5 @@
+import { ParentHandshake, WindowMessenger } from 'post-me';
+
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -1234,7 +1236,7 @@ var require_cipher_core = __commonJS({
         var BufferedBlockAlgorithm = C_lib.BufferedBlockAlgorithm;
         var C_enc = C.enc;
         C_enc.Utf8;
-        var Base64 = C_enc.Base64;
+        var Base642 = C_enc.Base64;
         var C_algo = C.algo;
         var EvpKDF = C_algo.EvpKDF;
         var Cipher = C_lib.Cipher = BufferedBlockAlgorithm.extend({
@@ -1644,7 +1646,7 @@ var require_cipher_core = __commonJS({
             } else {
               wordArray = ciphertext;
             }
-            return wordArray.toString(Base64);
+            return wordArray.toString(Base642);
           },
           /**
            * Converts an OpenSSL-compatible string to a cipher params object.
@@ -1661,7 +1663,7 @@ var require_cipher_core = __commonJS({
            */
           parse: function(openSSLStr) {
             var salt;
-            var ciphertext = Base64.parse(openSSLStr);
+            var ciphertext = Base642.parse(openSSLStr);
             var ciphertextWords = ciphertext.words;
             if (ciphertextWords[0] == 1398893684 && ciphertextWords[1] == 1701076831) {
               salt = WordArray.create(ciphertextWords.slice(2, 4));
@@ -2029,6 +2031,127 @@ var require_enc_utf8 = __commonJS({
   }
 });
 
+// node_modules/.pnpm/crypto-js@4.2.0/node_modules/crypto-js/sha256.js
+var require_sha256 = __commonJS({
+  "node_modules/.pnpm/crypto-js@4.2.0/node_modules/crypto-js/sha256.js"(exports$1, module) {
+    (function(root, factory) {
+      if (typeof exports$1 === "object") {
+        module.exports = exports$1 = factory(require_core());
+      } else if (typeof define === "function" && define.amd) {
+        define(["./core"], factory);
+      } else {
+        factory(root.CryptoJS);
+      }
+    })(exports$1, function(CryptoJS) {
+      (function(Math2) {
+        var C = CryptoJS;
+        var C_lib = C.lib;
+        var WordArray = C_lib.WordArray;
+        var Hasher = C_lib.Hasher;
+        var C_algo = C.algo;
+        var H = [];
+        var K = [];
+        (function() {
+          function isPrime(n2) {
+            var sqrtN = Math2.sqrt(n2);
+            for (var factor = 2; factor <= sqrtN; factor++) {
+              if (!(n2 % factor)) {
+                return false;
+              }
+            }
+            return true;
+          }
+          function getFractionalBits(n2) {
+            return (n2 - (n2 | 0)) * 4294967296 | 0;
+          }
+          var n = 2;
+          var nPrime = 0;
+          while (nPrime < 64) {
+            if (isPrime(n)) {
+              if (nPrime < 8) {
+                H[nPrime] = getFractionalBits(Math2.pow(n, 1 / 2));
+              }
+              K[nPrime] = getFractionalBits(Math2.pow(n, 1 / 3));
+              nPrime++;
+            }
+            n++;
+          }
+        })();
+        var W = [];
+        var SHA2562 = C_algo.SHA256 = Hasher.extend({
+          _doReset: function() {
+            this._hash = new WordArray.init(H.slice(0));
+          },
+          _doProcessBlock: function(M, offset) {
+            var H2 = this._hash.words;
+            var a = H2[0];
+            var b = H2[1];
+            var c = H2[2];
+            var d = H2[3];
+            var e = H2[4];
+            var f = H2[5];
+            var g = H2[6];
+            var h = H2[7];
+            for (var i = 0; i < 64; i++) {
+              if (i < 16) {
+                W[i] = M[offset + i] | 0;
+              } else {
+                var gamma0x = W[i - 15];
+                var gamma0 = (gamma0x << 25 | gamma0x >>> 7) ^ (gamma0x << 14 | gamma0x >>> 18) ^ gamma0x >>> 3;
+                var gamma1x = W[i - 2];
+                var gamma1 = (gamma1x << 15 | gamma1x >>> 17) ^ (gamma1x << 13 | gamma1x >>> 19) ^ gamma1x >>> 10;
+                W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16];
+              }
+              var ch = e & f ^ ~e & g;
+              var maj = a & b ^ a & c ^ b & c;
+              var sigma0 = (a << 30 | a >>> 2) ^ (a << 19 | a >>> 13) ^ (a << 10 | a >>> 22);
+              var sigma1 = (e << 26 | e >>> 6) ^ (e << 21 | e >>> 11) ^ (e << 7 | e >>> 25);
+              var t1 = h + sigma1 + ch + K[i] + W[i];
+              var t2 = sigma0 + maj;
+              h = g;
+              g = f;
+              f = e;
+              e = d + t1 | 0;
+              d = c;
+              c = b;
+              b = a;
+              a = t1 + t2 | 0;
+            }
+            H2[0] = H2[0] + a | 0;
+            H2[1] = H2[1] + b | 0;
+            H2[2] = H2[2] + c | 0;
+            H2[3] = H2[3] + d | 0;
+            H2[4] = H2[4] + e | 0;
+            H2[5] = H2[5] + f | 0;
+            H2[6] = H2[6] + g | 0;
+            H2[7] = H2[7] + h | 0;
+          },
+          _doFinalize: function() {
+            var data = this._data;
+            var dataWords = data.words;
+            var nBitsTotal = this._nDataBytes * 8;
+            var nBitsLeft = data.sigBytes * 8;
+            dataWords[nBitsLeft >>> 5] |= 128 << 24 - nBitsLeft % 32;
+            dataWords[(nBitsLeft + 64 >>> 9 << 4) + 14] = Math2.floor(nBitsTotal / 4294967296);
+            dataWords[(nBitsLeft + 64 >>> 9 << 4) + 15] = nBitsTotal;
+            data.sigBytes = dataWords.length * 4;
+            this._process();
+            return this._hash;
+          },
+          clone: function() {
+            var clone = Hasher.clone.call(this);
+            clone._hash = this._hash.clone();
+            return clone;
+          }
+        });
+        C.SHA256 = Hasher._createHelper(SHA2562);
+        C.HmacSHA256 = Hasher._createHmacHelper(SHA2562);
+      })(Math);
+      return CryptoJS.SHA256;
+    });
+  }
+});
+
 // src/types.ts
 var CommunityAppsInstalledAppStatus = /* @__PURE__ */ ((CommunityAppsInstalledAppStatus2) => {
   CommunityAppsInstalledAppStatus2[CommunityAppsInstalledAppStatus2["Installed"] = 1] = "Installed";
@@ -2084,6 +2207,41 @@ var appendEncryptedDataToUrl = (url, encryptedData, useHash) => {
     destinationUrl.searchParams.set("data", encodeURI(encryptedData));
   }
   return destinationUrl.toString();
+};
+
+// src/community-apps.ts
+var import_sha256 = __toESM(require_sha256());
+var import_enc_base64 = __toESM(require_enc_base64());
+var COMMUNITY_APPS_INSTALLED_APPS_ALGORITHM = "sha256-128";
+var COMMUNITY_APPS_INSTALLED_APP_HASH_LENGTH = 22;
+var createCommunityAppsInstalledAppHash = (stableIdentifier, salt) => {
+  const digest = (0, import_sha256.default)(`${salt}\0${stableIdentifier}`);
+  digest.sigBytes = 16;
+  digest.clamp();
+  return digest.toString(import_enc_base64.default).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+};
+var isCommunityAppsInstalledAppHash = (value) => typeof value === "string" && /^[A-Za-z0-9_-]{22}$/.test(value) && value.length === COMMUNITY_APPS_INSTALLED_APP_HASH_LENGTH;
+var createCommunityAppsInstalledAppsHostBridge = async ({
+  iframeWindow,
+  iframeOrigin,
+  methods,
+  localWindow,
+  maxHandshakeAttempts = 20,
+  handshakeAttemptIntervalMs = 100
+}) => {
+  const connection = await ParentHandshake(
+    new WindowMessenger({
+      localWindow,
+      remoteWindow: iframeWindow,
+      remoteOrigin: iframeOrigin
+    }),
+    methods,
+    maxHandshakeAttempts,
+    handshakeAttemptIntervalMs
+  );
+  return {
+    close: () => connection.close()
+  };
 };
 
 // src/client.ts
@@ -2169,4 +2327,4 @@ var createCallback = (config) => {
 };
 var useCallback = createCallback;
 
-export { CommunityAppsInstalledAppStatus, createCallback, useCallback };
+export { COMMUNITY_APPS_INSTALLED_APPS_ALGORITHM, COMMUNITY_APPS_INSTALLED_APP_HASH_LENGTH, CommunityAppsInstalledAppStatus, createCallback, createCommunityAppsInstalledAppHash, createCommunityAppsInstalledAppsHostBridge, isCommunityAppsInstalledAppHash, useCallback };

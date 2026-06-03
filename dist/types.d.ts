@@ -96,16 +96,33 @@ export interface ServerTroubleshoot {
     server: ServerData;
 }
 export type CommunityAppsInstalledAppsAlgorithm = "sha256-128";
+export type CommunityAppsInstalledAppsMode = "batch" | "lookup";
 export declare enum CommunityAppsInstalledAppStatus {
     Installed = 1,
     PreviouslyInstalled = 2
 }
 export type CommunityAppsInstalledAppHash = string;
 export type CommunityAppsInstalledAppStatusMap = Record<CommunityAppsInstalledAppHash, CommunityAppsInstalledAppStatus>;
-export interface CommunityAppsInstalledApps {
+export interface CommunityAppsInstalledAppsBase {
     enabled: true;
     algorithm: CommunityAppsInstalledAppsAlgorithm;
+    mode?: CommunityAppsInstalledAppsMode;
     salt: string;
+}
+export interface CommunityAppsInstalledAppsBatch extends CommunityAppsInstalledAppsBase {
+    mode?: "batch";
+    apps: CommunityAppsInstalledAppStatusMap;
+}
+export interface CommunityAppsInstalledAppsLookup extends CommunityAppsInstalledAppsBase {
+    mode: "lookup";
+}
+export type CommunityAppsInstalledApps = CommunityAppsInstalledAppsBatch | CommunityAppsInstalledAppsLookup;
+export interface CommunityAppsInstalledAppStatusRequest {
+    algorithm: CommunityAppsInstalledAppsAlgorithm;
+    salt: string;
+    appHashes: CommunityAppsInstalledAppHash[];
+}
+export interface CommunityAppsInstalledAppStatusResponse {
     apps: CommunityAppsInstalledAppStatusMap;
 }
 export interface CommunityAppsLaunch {
