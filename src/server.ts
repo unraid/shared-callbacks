@@ -36,9 +36,14 @@ import type {
   ServerPayload,
   ServerTroubleshoot,
   CommunityAppsInstalledAppsAlgorithm,
+  CommunityAppsInstalledAppsMode,
   CommunityAppsInstalledAppHash,
   CommunityAppsInstalledAppStatusMap,
+  CommunityAppsInstalledAppsBatch,
+  CommunityAppsInstalledAppsLookup,
   CommunityAppsInstalledApps,
+  CommunityAppsInstalledAppStatusRequest,
+  CommunityAppsInstalledAppStatusResponse,
   CommunityAppsLaunch,
   ExternalActions,
   UpcActions,
@@ -51,6 +56,12 @@ import {
   createEncryptedPayload,
   parseEncryptedPayload,
 } from "./core.js";
+export {
+  COMMUNITY_APPS_INSTALLED_APP_HASH_LENGTH,
+  COMMUNITY_APPS_INSTALLED_APPS_ALGORITHM,
+  createCommunityAppsInstalledAppHash,
+  isCommunityAppsInstalledAppHash,
+} from "./community-apps.js";
 
 /**
  * Server-safe factory that exposes only parse and generateUrl.
@@ -131,9 +142,14 @@ export type {
   ServerPayload,
   ServerTroubleshoot,
   CommunityAppsInstalledAppsAlgorithm,
+  CommunityAppsInstalledAppsMode,
   CommunityAppsInstalledAppHash,
   CommunityAppsInstalledAppStatusMap,
+  CommunityAppsInstalledAppsBatch,
+  CommunityAppsInstalledAppsLookup,
   CommunityAppsInstalledApps,
+  CommunityAppsInstalledAppStatusRequest,
+  CommunityAppsInstalledAppStatusResponse,
   CommunityAppsLaunch,
   ExternalActions,
   UpcActions,
