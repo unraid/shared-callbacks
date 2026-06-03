@@ -1,0 +1,107 @@
+name: Publish Alpha
+
+on:
+  push:
+    branches:
+      - alpha
+  pull_request:
+    paths:
+      - ".github/workflows/publish-alpha.yml"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "src/**"
+      - "tsconfig.json"
+      - "tsup.config.ts"
+      - "vitest.config.ts"
+  workflow_dispatch:
+    inputs:
+      base_version:
+        description: "Optional prerelease base version, e.g. 3.2.0. Defaults to next minor from package.json."
+        required: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Set Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v5
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-alpha-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-alpha-
+            ${{ runner.os }}-pnpm-store-
+
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: Set alpha version
+        if: github.event_name != 'pull_request'
+        shell: bash
+        env:
+          BASE_VERSION_INPUT: ${{ github.event.inputs.base_version }}
+        run: |
+          BASE_VERSION="$(node - <<'NODE'
+          const fs = require('node:fs');
+          const input = process.env.BASE_VERSION_INPUT?.trim();
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const stable = String(pkg.version).split('-')[0];
+
+          if (input) {
+            if (!/^\d+\.\d+\.\d+$/.test(input)) {
+              throw new Error(`base_version must be x.y.z, received: ${input}`);
+            }
+            console.log(input);
+            return;
+          }
+
+          const [major, minor] = stable.split('.').map(Number);
+          console.log(`${major}.${minor + 1}.0`);
+          NODE
+          )"
+          ALPHA_VERSION="${BASE_VERSION}-alpha.${GITHUB_RUN_NUMBER}"
+          echo "Publishing alpha version ${ALPHA_VERSION}"
+          npm version "$ALPHA_VERSION" --no-git-tag-version --allow-same-version
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Test
+        run: pnpm run test:coverage
+
+      - name: Publish alpha to NPM
+        if: github.event_name != 'pull_request'
+        run: pnpm publish --tag alpha --provenance --no-git-checks
