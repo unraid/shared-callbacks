@@ -43,6 +43,7 @@ export interface ServerData {
     description?: string;
     deviceCount?: number;
     expireTime?: number;
+    flashGuid?: string;
     flashProduct?: string;
     flashVendor?: string;
     guid?: string;
@@ -58,6 +59,7 @@ export interface ServerData {
     regGuid?: string;
     regTy?: string;
     state: ServerState;
+    tpmGuid?: string;
     wanFQDN?: string;
 }
 export interface UserInfo {
