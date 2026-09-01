@@ -15,9 +15,11 @@ describe('createServerCallback (server entry)', () => {
         server: {
           connectPluginVersion: '2024.05.06.1049',
           connectState: 'CONNECTED',
+          flashGuid: 'flash-guid',
           guid: 'test-guid',
           registered: false,
           state: 'ENOCONN',
+          tpmGuid: '01-tpm-guid',
         },
       },
     ]
