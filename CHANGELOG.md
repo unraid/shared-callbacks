@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/unraid/shared-callbacks/compare/v3.1.0...v3.2.0) (2026-09-01)
+
+
+### Features
+
+* **callbacks:** expose physical licensing identities ([#59](https://github.com/unraid/shared-callbacks/issues/59)) ([4dc7007](https://github.com/unraid/shared-callbacks/commit/4dc70073abf73a8b051137eea8768a54d7a8a9c9))
+
 ## [3.1.0](https://github.com/unraid/shared-callbacks/compare/v3.0.0...v3.1.0) (2026-03-24)
 
 
