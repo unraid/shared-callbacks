@@ -20,6 +20,7 @@ describe('createServerCallback (server entry)', () => {
           registered: false,
           state: 'ENOCONN',
           tpmGuid: '01-tpm-guid',
+          usbGuid: 'usb-guid',
         },
       },
     ]
