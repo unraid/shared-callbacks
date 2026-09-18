@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.0](https://github.com/unraid/shared-callbacks/compare/v3.2.0...v3.3.0) (2026-09-18)
+
+
+### Features
+
+* **callbacks:** expose USB device identity ([#64](https://github.com/unraid/shared-callbacks/issues/64)) ([6da3434](https://github.com/unraid/shared-callbacks/commit/6da343406d224c0029ca8456233dabf610cb5f2a))
+
 ## [3.2.0](https://github.com/unraid/shared-callbacks/compare/v3.1.0...v3.2.0) (2026-09-01)
 
 
