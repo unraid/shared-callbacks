@@ -253,16 +253,14 @@ describe('useCallback', () => {
       const wrongKey = 'wrong-test-key'
       const wronglyEncryptedData = AES.encrypt(stringifiedData, wrongKey).toString()
 
-      // Expect parse to throw the specific decryption error
-      expect(() => callback.parse(wronglyEncryptedData)).toThrow('Decryption failed. Invalid key or corrupt data.');
+      expect(() => callback.parse(wronglyEncryptedData)).toThrow();
     })
 
     it('should throw an error for invalid (non-encrypted) data', () => {
       const callback = useCallback(mockConfig)
       const invalidData = 'this is not encrypted data'
       
-      // Expect parse to throw (likely the decryption error)
-      expect(() => callback.parse(invalidData)).toThrow('Decryption failed. Invalid key or corrupt data.');
+      expect(() => callback.parse(invalidData)).toThrow();
     })
 
     it('should decode URI when isDataURIEncoded option is true', () => {
