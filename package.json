@@ -52,11 +52,5 @@
     "typescript": "^6.0.0",
     "vitest": "^4.0.0"
   },
-  "packageManager": "pnpm@12.4.2",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "vue-demi"
-    ]
-  }
+  "packageManager": "pnpm@12.4.2"
 }
