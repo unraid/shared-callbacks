@@ -119,6 +119,7 @@ export interface ServerData {
   regTy?: string;
   state: ServerState;
   tpmGuid?: string;
+  usbGuid?: string;
   wanFQDN?: string;
 }
 
