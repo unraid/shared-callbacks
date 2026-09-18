@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.1](https://github.com/unraid/shared-callbacks/compare/v3.3.0...v3.3.1) (2026-09-18)
+
+
+### Bug Fixes
+
+* **ci:** allow publishing generated package after release ([#66](https://github.com/unraid/shared-callbacks/issues/66)) ([43c4c3f](https://github.com/unraid/shared-callbacks/commit/43c4c3ffd9e7bddc56390428c2484cc5e477cee1))
+
 ## [3.3.0](https://github.com/unraid/shared-callbacks/compare/v3.2.0...v3.3.0) (2026-09-18)
 
 
