@@ -63,14 +63,16 @@ export const createServerCallback = (config: CallbackConfig) => {
     url: string,
     payload: SendPayloads,
     sendType?: string,
-    sender?: string
+    sender?: string,
+    nonce?: string
   ): string => {
     const effectiveSender = sender ?? "";
     const encryptedMessage = createEncryptedPayload(
       payload,
       effectiveSender,
       sendType,
-      config.encryptionKey
+      config.encryptionKey,
+      nonce
     );
 
     const shouldUseHash = config.useHash !== false;

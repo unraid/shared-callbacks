@@ -54,7 +54,8 @@ export const createCallback = (config: CallbackConfig) => {
     payload: SendPayloads,
     redirectType?: "newTab" | "replace" | null,
     sendType?: string,
-    sender?: string
+    sender?: string,
+    nonce?: string
   ) => {
     if (typeof window === "undefined") {
       throw new Error("send() can only be called on the client side");
@@ -67,7 +68,8 @@ export const createCallback = (config: CallbackConfig) => {
       payload,
       defaultSender,
       sendType,
-      config.encryptionKey
+      config.encryptionKey,
+      nonce
     );
 
     const destinationUrl = appendEncryptedDataToUrl(
@@ -150,7 +152,8 @@ export const createCallback = (config: CallbackConfig) => {
     url: string,
     payload: SendPayloads,
     sendType?: string,
-    sender?: string
+    sender?: string,
+    nonce?: string
   ): string => {
     const defaultSender =
       sender ??
@@ -162,7 +165,8 @@ export const createCallback = (config: CallbackConfig) => {
       payload,
       defaultSender,
       sendType,
-      config.encryptionKey
+      config.encryptionKey,
+      nonce
     );
 
     return appendEncryptedDataToUrl(url, encryptedMessage, shouldUseHash);

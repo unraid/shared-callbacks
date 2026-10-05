@@ -101,11 +101,15 @@ export type ExternalActions = ExternalSignIn | ExternalSignOut | ExternalKeyActi
 export type UpcActions = ServerPayload | ServerTroubleshoot;
 export type SendPayloads = ExternalActions[] | UpcActions[];
 export interface ExternalPayload {
+    /** Opaque receiver-issued intent; echo unchanged in the reply. */
+    nonce?: string;
     type: "forUpc";
     actions: ExternalActions[];
     sender: string;
 }
 export interface UpcPayload {
+    /** Opaque receiver-issued intent; echo unchanged in the reply. */
+    nonce?: string;
     actions: UpcActions[];
     sender: string;
     type: "fromUpc";

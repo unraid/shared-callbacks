@@ -9,6 +9,6 @@ export declare const createServerCallback: (config: CallbackConfig) => {
     parse: (data: string, options?: {
         isDataURIEncoded?: boolean;
     }) => QueryPayloads;
-    generateUrl: (url: string, payload: SendPayloads, sendType?: string, sender?: string) => string;
+    generateUrl: (url: string, payload: SendPayloads, sendType?: string, sender?: string, nonce?: string) => string;
 };
 export type { CallbackConfig, QueryPayloads, SendPayloads, SignIn, SignOut, OemSignOut, Troubleshoot, Recover, Replace, TrialExtend, TrialStart, Purchase, Redeem, Renew, Upgrade, UpdateOs, DowngradeOs, Manage, MyKeys, LinkKey, Activate, AccountActionTypes, AccountKeyActionTypes, PurchaseActionTypes, ServerActionTypes, ConnectState, ServerState, ServerData, UserInfo, ExternalSignIn, ExternalSignOut, ExternalKeyActions, ExternalUpdateOsAction, ServerPayload, ServerTroubleshoot, ExternalActions, UpcActions, ExternalPayload, UpcPayload, };

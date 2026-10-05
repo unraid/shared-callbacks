@@ -44,6 +44,13 @@ describe('createServerCallback (server entry)', () => {
     })
   })
 
+  it.each([true, false])('preserves an optional nonce with useHash=%s', (useHash) => {
+    const callback = createServerCallback({ ...config, useHash });
+    const url = new URL(callback.generateUrl('https://server.test/redirect', [{ type: 'signOut' }], 'forUpc', 'account', 'signed-intent'));
+    const ciphertext = useHash ? url.hash.slice(6) : url.searchParams.get('data')!;
+    expect(callback.parse(ciphertext, { isDataURIEncoded: true }).nonce).toBe('signed-intent');
+  });
+
   it('should default sender to an empty string when generateUrl omits it', () => {
     const { parse, generateUrl } = createServerCallback(config)
     const testActions: ServerPayload[] = [

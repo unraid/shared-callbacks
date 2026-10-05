@@ -42,7 +42,7 @@ var require_core = __commonJS({
         root.CryptoJS = factory();
       }
     })(exports$1, function() {
-      var CryptoJS = CryptoJS || (function(Math2, undefined$1) {
+      var CryptoJS = CryptoJS || (function(Math2, undefined2) {
         var crypto;
         if (typeof window !== "undefined" && window.crypto) {
           crypto = window.crypto;
@@ -210,7 +210,7 @@ var require_core = __commonJS({
            */
           init: function(words, sigBytes) {
             words = this.words = words || [];
-            if (sigBytes != undefined$1) {
+            if (sigBytes != undefined2) {
               this.sigBytes = sigBytes;
             } else {
               this.sigBytes = words.length * 4;
@@ -1226,7 +1226,7 @@ var require_cipher_core = __commonJS({
         factory(root.CryptoJS);
       }
     })(exports$1, function(CryptoJS) {
-      CryptoJS.lib.Cipher || (function(undefined$1) {
+      CryptoJS.lib.Cipher || (function(undefined2) {
         var C = CryptoJS;
         var C_lib = C.lib;
         var Base = C_lib.Base;
@@ -1480,7 +1480,7 @@ var require_cipher_core = __commonJS({
             var iv = this._iv;
             if (iv) {
               block = iv;
-              this._iv = undefined$1;
+              this._iv = undefined2;
             } else {
               block = this._prevBlock;
             }
@@ -2048,15 +2048,16 @@ var decryptData = (encryptedData, encryptionKey) => {
   }
   return decryptedString;
 };
-var stringifyPayload = (payload, sender, sendType) => {
+var stringifyPayload = (payload, sender, sendType, nonce) => {
   return JSON.stringify({
     actions: [...payload],
     sender,
-    type: sendType
+    type: sendType,
+    ...nonce === void 0 ? {} : { nonce }
   });
 };
-var createEncryptedPayload = (payload, sender, sendType, encryptionKey) => {
-  const stringifiedData = stringifyPayload(payload, sender, sendType);
+var createEncryptedPayload = (payload, sender, sendType, encryptionKey, nonce) => {
+  const stringifiedData = stringifyPayload(payload, sender, sendType, nonce);
   return encryptData(stringifiedData, encryptionKey);
 };
 var parseEncryptedPayload = (encryptedData, encryptionKey, options) => {
@@ -2084,13 +2085,14 @@ var createServerCallback = (config) => {
   const parse = (data, options) => {
     return parseEncryptedPayload(data, config.encryptionKey, options);
   };
-  const generateUrl = (url, payload, sendType, sender) => {
+  const generateUrl = (url, payload, sendType, sender, nonce) => {
     const effectiveSender = sender ?? "";
     const encryptedMessage = createEncryptedPayload(
       payload,
       effectiveSender,
       sendType,
-      config.encryptionKey
+      config.encryptionKey,
+      nonce
     );
     const shouldUseHash = config.useHash !== false;
     return appendEncryptedDataToUrl(url, encryptedMessage, shouldUseHash);
