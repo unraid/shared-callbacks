@@ -1,15 +1,8 @@
 {
   "disposition": "PATCH",
-  "expected_structural_delta": "0 owners, 0 dependencies; existing serializers/types, tests/docs/generated distribution",
-  "minimum_design": "Extend existing payload serializer and optional final send/generateUrl parameter; U8 policy remains Core-owned",
-  "outcome": "Optional encrypted nonce survives callback round trips",
-  "reuse_decisions": [
-    {
-      "decision": "extend",
-      "name": "callback envelope",
-      "rationale": "Existing serializer owns request and reply envelope"
-    }
-  ],
+  "forecast_commit": "b6b72070c2e8a40a8ce1955a5abd45fd5585fcde",
+  "reviewed_sha": "d7533e4e06d1c024072f0e925c32756d5ebb89fd",
   "schema": "limetech.ai-review-marker.v2",
-  "stage": "forecast"
+  "stage": "final",
+  "unresolved_proportionality_findings": []
 }
