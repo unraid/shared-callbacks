@@ -120,6 +120,6 @@ const { parse, generateUrl } = createServerCallback(config);
 nonce. It is encrypted as `nonce` beside `actions`, `sender` and `type` in both
 request and reply payloads. Echo the request nonce unchanged; do not generate a
 replacement in Account. Omitting it preserves the legacy payload shape. Receiver
-policy decides whether it is required: Unraid 8 OS update callbacks require the
+policy decides whether it is required: native OS update callbacks require the
 Core-issued signed intent, whose one-hour expiry and owner binding Core verifies.
 A nonce is not authentication by itself.
