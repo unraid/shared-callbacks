@@ -39,12 +39,14 @@ export const decryptData = (
 export const stringifyPayload = (
   payload: SendPayloads,
   sender: string,
-  sendType?: string
+  sendType?: string,
+  nonce?: string
 ): string => {
   return JSON.stringify({
     actions: [...payload],
     sender,
     type: sendType,
+    ...(nonce === undefined ? {} : { nonce }),
   });
 };
 
@@ -55,9 +57,10 @@ export const createEncryptedPayload = (
   payload: SendPayloads,
   sender: string,
   sendType: string | undefined,
-  encryptionKey: string
+  encryptionKey: string,
+  nonce?: string
 ): string => {
-  const stringifiedData = stringifyPayload(payload, sender, sendType);
+  const stringifiedData = stringifyPayload(payload, sender, sendType, nonce);
   return encryptData(stringifiedData, encryptionKey);
 };
 

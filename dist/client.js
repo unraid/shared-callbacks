@@ -2048,15 +2048,16 @@ var decryptData = (encryptedData, encryptionKey) => {
   }
   return decryptedString;
 };
-var stringifyPayload = (payload, sender, sendType) => {
+var stringifyPayload = (payload, sender, sendType, nonce) => {
   return JSON.stringify({
     actions: [...payload],
     sender,
-    type: sendType
+    type: sendType,
+    ...nonce === void 0 ? {} : { nonce }
   });
 };
-var createEncryptedPayload = (payload, sender, sendType, encryptionKey) => {
-  const stringifiedData = stringifyPayload(payload, sender, sendType);
+var createEncryptedPayload = (payload, sender, sendType, encryptionKey, nonce) => {
+  const stringifiedData = stringifyPayload(payload, sender, sendType, nonce);
   return encryptData(stringifiedData, encryptionKey);
 };
 var parseEncryptedPayload = (encryptedData, encryptionKey, options) => {
@@ -2082,7 +2083,7 @@ var appendEncryptedDataToUrl = (url, encryptedData, useHash) => {
 // src/client.ts
 var createCallback = (config) => {
   const shouldUseHash = config.useHash !== false;
-  const send = (url, payload, redirectType, sendType, sender) => {
+  const send = (url, payload, redirectType, sendType, sender, nonce) => {
     if (typeof window === "undefined") {
       throw new Error("send() can only be called on the client side");
     }
@@ -2091,7 +2092,8 @@ var createCallback = (config) => {
       payload,
       defaultSender,
       sendType,
-      config.encryptionKey
+      config.encryptionKey,
+      nonce
     );
     const destinationUrl = appendEncryptedDataToUrl(
       url.replace("/Tools/Update", "/Tools"),
@@ -2143,13 +2145,14 @@ var createCallback = (config) => {
     }
     return parse(uriDecodedEncryptedData);
   };
-  const generateUrl = (url, payload, sendType, sender) => {
+  const generateUrl = (url, payload, sendType, sender, nonce) => {
     const defaultSender = sender ?? (typeof window !== "undefined" ? window.location.href.replace("/Tools/Update", "/Tools") : "");
     const encryptedMessage = createEncryptedPayload(
       payload,
       defaultSender,
       sendType,
-      config.encryptionKey
+      config.encryptionKey,
+      nonce
     );
     return appendEncryptedDataToUrl(url, encryptedMessage, shouldUseHash);
   };

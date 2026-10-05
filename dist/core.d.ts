@@ -11,11 +11,11 @@ export declare const decryptData: (encryptedData: string, encryptionKey: string)
 /**
  * Stringifies a payload into the standard callback data format.
  */
-export declare const stringifyPayload: (payload: SendPayloads, sender: string, sendType?: string) => string;
+export declare const stringifyPayload: (payload: SendPayloads, sender: string, sendType?: string, nonce?: string) => string;
 /**
  * Creates an encrypted data string from a payload.
  */
-export declare const createEncryptedPayload: (payload: SendPayloads, sender: string, sendType: string | undefined, encryptionKey: string) => string;
+export declare const createEncryptedPayload: (payload: SendPayloads, sender: string, sendType: string | undefined, encryptionKey: string, nonce?: string) => string;
 /**
  * Parses an encrypted callback payload string into its typed structure.
  */
